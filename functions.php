@@ -337,6 +337,14 @@ function display_archives($usernev)
 	print(strtr(get_archivetemplate($user['id'], "footer"), $csere));
 }
 
+function first_words($input)
+{
+	global $postcim_lenght;
+	$words = explode(' ', strip_tags($input));
+	$words = array_slice($words, 0, $postcim_lenght);
+	return(implode(' ', $words) . "...");
+}
+
 function display_archivemonth($user, $honap)
 {
 	global $date_format, $site_root, $date_format_display;
@@ -372,6 +380,9 @@ function display_archivemonth($user, $honap)
 	print(strtr(get_archivetemplate($userid, "monthfooter"), $csere));
 }
 
+		if(is_null($i['title']))
+			$i['title']=first_words($i['content']);
+		
 // header, monthheader, post, monthfooter v footer lehet. default: post
 
 function get_archivetemplate($id, $type)

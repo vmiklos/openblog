@@ -8,4 +8,5 @@ $site_root  = "";
 $date_format='%Y%m';
 
 setlocale (LC_TIME, "hu_HU");
+$postcim_lenght = 5;
 ?>
