@@ -11,6 +11,8 @@ print("
 <tr><td>Sablonod neve:<td><input type=text name=templatetitle value=\"" . $user['templatetitle'] . "\"><br>
 <tr><td valign=top>Sablon:<td><textarea cols=80 rows=20 name=\"template\">
 " . $user['template'] . "</textarea><br>
+<tr><td valign=top>Archívumsablon:<td><textarea cols=80 rows=20 name=\"archivetemplate\">
+" . $user['archivetemplate'] . "</textarea><br>
 <tr><td><td><input type=\"submit\" value=\"Meg akarok változni!\">
 </table>
 </form>

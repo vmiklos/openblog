@@ -476,6 +476,7 @@ function edit_prefs($usernev)
 	$query = "SELECT id, nev FROM templates";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+					archivetemplate = '" . addslashes(stripslashes($_POST['archivetemplate'])) . "',
 		$templates[]= array($i['id'], $i['nev']);
 	
 	include("templates/edit_prefs.php");
