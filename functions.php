@@ -37,6 +37,11 @@ if (!function_exists('file_put_contents'))
 function display_fooldal()
 {
 	global $site_root, $users_limit, $posts_limit, $news_limit;
+	$query = "SELECT id, name, displayname FROM users";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$userdb[$i['id']]=$i;
+	mysql_free_result($result);
 	$query = "SELECT id, name, displayname, blogtitle, email, registration_date FROM users ORDER BY registration_date DESC LIMIT $users_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
@@ -45,12 +50,18 @@ function display_fooldal()
 	$query = "SELECT id, userid, title, letrehozas FROM posts ORDER BY letrehozas DESC LIMIT $posts_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+	{
+		$i['name']=$userdb[$i['userid']]['name'];
 		$posts[]=$i;
+	}
 	mysql_free_result($result);
 	$query = "SELECT id, cim, content, authorid FROM news ORDER BY letrehozas DESC LIMIT $news_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+	{
+		$i['author']=name2nick($userdb[$i['authorid']]['name']);
 		$news[]=$i;
+	}
 	mysql_free_result($result);
 	include("templates/fooldal.php");
 }
