@@ -10,6 +10,5 @@ print("
 <tr><td><input type=\"submit\" value=\"Meg akarok változni!\">
 </table>
 </form>
-<a href=\"$site_root/" . $user['name'] . "\">Vissza a fõlapra</a>
 ")
 ?>

@@ -275,7 +275,7 @@ function edit_prefs($usernev)
 				`limit` ='" . addslashes(stripslashes($_POST['limit'])) . "'
 				WHERE id =" . $user['id'];
 				$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-				include("templates/edit_prefs_done.php");
+				header("Location: $site_root/" . $user['name']);
 			}
 			else
 				die("Nem megfelelõ felhasználónév vagy jelszó!");
