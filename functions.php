@@ -135,6 +135,7 @@ function display_user($name)
 
 function delete_post($postid)
 {
+	global $site_root;
 	is_numeric($postid) or die("Nem szám: $postid");
 	$query = "SELECT userid FROM posts WHERE id=$postid";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
@@ -157,7 +158,7 @@ function delete_post($postid)
 		{
 			$query = "DELETE FROM posts WHERE id=" . $postid;
 			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-			print("Töröltem!");
+			header("Location: $site_root/index.php/" . $user['name']);
 		}
 		else
 			die("Nem megfelelõ felhasználónév vagy jelszó!");
