@@ -22,3 +22,9 @@ $post
 <post></post>
 
 $deleteurl - törlõ url-je a postnak
+Tudnivalók az archívum-sablonokról
+==================================
+
+Az archívumsablon egészen hasonló a normál sablonhoz. Mégis, akkor mik a különbségek?
+A <post> tagen kívül 1 <month> taged is van, az ezek közötti rész fog megismétlõdni havonta.
+A fej- és láblécben (tehát a hónapokon kívül) ugyanazok a változók használhatók, mint a normál sablonban a bejegyzéseken kívül.
