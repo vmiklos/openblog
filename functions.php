@@ -36,7 +36,9 @@ if (!function_exists('file_put_contents'))
 
 function display_fooldal()
 {
-	global $site_root, $users_limit, $posts_limit, $news_limit;
+	global $site_root, $users_limit, $posts_limit, $news_limit,
+		$date_format_fooldalipost;
+	
 	$query = "SELECT id, name, displayname FROM users";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
@@ -47,11 +49,12 @@ function display_fooldal()
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$users[]=$i;
 	mysql_free_result($result);
-	$query = "SELECT id, userid, title, letrehozas FROM posts ORDER BY letrehozas DESC LIMIT $posts_limit";
+	$query = "SELECT id, userid, title, date_format(letrehozas, '$date_format_fooldalipost') FROM posts ORDER BY letrehozas DESC LIMIT $posts_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 	{
 		$i['name']=$userdb[$i['userid']]['name'];
+		$i['letrehozas']=$i["date_format(letrehozas, '$date_format_fooldalipost')"];
 		$posts[]=$i;
 	}
 	mysql_free_result($result);
