@@ -34,57 +34,20 @@ foreach($posts as $i)
 </div>
 </div>
 </div>
+
 <div id="content">
-<div class="new">
-<h1>Népszerû a blogolás</h1>
-
-<h2>2005.03.27. | vmiklos</h2>
-<p>Több helyen olvastam már az online napló, illetve a webnapló fogalmak
-használatát. A weblogok eleinte valóban olyan website-ok voltak, amelyek
-egyfajta dátum szerint vezetett online naplóként m?ködtek. </p>
-<p>A blogok alapfunkciója ugyan ma is ez, de a fejl?dés hatására számos új eszközzel,
-tartalmi és technológiai megoldással gazdagodtak, így a webnapló kifejezés
-olyan túlzott leegyszer?sítés lenne, mintha a pr-t egyszer?en
-közkapcsolatoknak neveznénk, egy szó szerinti fordítást követ?en.</p>
+<?
+foreach($news as $i)
+{
+	print("<div class=\"new\">
+	<h1>" . $i['cim'] . "</h1>
+	<h2>" . $i['letrehozas'] . " | " . $i['author'] . "</h2>
+	" . $i['content'] . "
+	</div>");
+}
+?>
 </div>
 
-<div class="new">
-<h1>Slackware</h1>
-<h2>2005.03.28. | djsmiley</h2>
-<p>Tavaly októberben merült fel elõször, hogy Pat akár véglegesen is
-eltávolíthatja a GNOME desktop és fejlesztõi környeztet a Slackware-bõl. Az
-indok a nehézkes karbantarthatóság volt.
-Már nem kell azon gondolkozni, hogy vajon mikortól kerül eltávolításra a
-GNOME, mert a mai nappal megtörtént...
-</p><p>
-Ahogy a DistroWatch írja a GNOME eltávolításra került a -current-bõl és
-teljes egészében közösségi karbantartás és terjesztés alá került. Mint Pat
-írja a logban, nem kívánja az eltávolítás okait ismét felsorolni. Mint írja
-nagyon régóta foglalkoztatja a gondolat, hogy meg kéne tenni. Szerinte több
-jó projekt is van, amely képes lesz Slackware GNOME-ot produkálni.</p>
-
-</div>
-
-<div class="new">
-<h1>Népszerû a spam?</h1>
-<h2>2005.03.29. | vmiklos</h2>
-<p>A köztudat szerint inkább gyûlöltnek tekintett spam a valóságban
-rendkívül népszerûnek mutatkozik az internetes levelezõk körében. Legalábbis
-erre utal, hogy egy közelmúltban elvégzett kutatás elõzetes eredményei
-szerint az elektronikus postafiókkal rendelkezõ emberek közül kb. minden
-harmadik rendszeresen kattint a kéretlen reklámlevelekben elhelyezett
-linkeken, egy tizedük pedig vásárol is az azokban hirdetett termékekbõl. 
-</p><p>
-A spamszûrõ szoftverek fejlesztésével foglalkozó Mirapoint és a piackutató
-Radicati Group a napokban tette közzé közelmúltbeli felmérésének eredményét,
-amely meglepõ számokkal szolgál a spam népszerûségét illetõen. Az általános
-vélekedés szerint ugyanis a kéretlen reklámlevelek sikeraránya - azaz a
-ténylegesen vásárlást generáló levelek az összes kiküldött emailekre
-vonatkoztatott száma - valahol néhány milliomod körül mozoghat, a felmérés
-adatai azonban ennél nagyságrendekkel "jobb" számokra utalnak.</p>
-</div>
-
-</div>
 <div id="footer">
 <? print($c_text); ?>
 </div>
