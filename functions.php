@@ -296,7 +296,7 @@ function edit_post($postid)
 
 function display_archives($usernev)
 {
-	global $date_format;
+	global $date_format, $site_root;
 	$query = "SELECT * FROM users WHERE name='$usernev'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -330,22 +330,36 @@ function display_archives($usernev)
 	
 	print(strtr(get_archivetemplate($user['id'], "header"), $csere));
 	foreach($honapok as $i)
-		display_archivemonth($user['id'], $i);
+		display_archivemonth($user, $i);
 	print(strtr(get_archivetemplate($user['id'], "footer"), $csere));
 }
 
-function display_archivemonth($userid, $honap)
+function display_archivemonth($user, $honap)
 {
-	global $date_format;
+	global $date_format, $site_root;
+	$userid=$user['id'];
 	$query="SELECT * FROM posts WHERE date_format(letrehozas, \"$date_format\" ) = \"$honap\" AND userid =$userid";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$posts[] = $i;
 	mysql_free_result($result);
-	print(get_archivetemplate($userid, "monthheader"));
+	
+	// a $cuccok lecserelese
+	$csere = array(
+		'$fooldal' => "$site_root/" . $user['name'],
+		'$newurl' => "$site_root/new/" . $user['name'],
+		'$prefsurl' => "$site_root/prefs/" . $user['name'],
+		'$nev' => name2nick($user['name']),
+		'$usernev' => $user['name'],
+		'$blogcim' => $user['blogtitle'],
+		'$email' => $user['email'],
+		'$honap' => $honap
+	);
+	
+	print(strtr(get_archivetemplate($userid, "monthheader"), $csere));
 	foreach($posts as $i)
 		print(get_archivetemplate($userid, "post"));
-	print(get_archivetemplate($userid, "monthfooter"));
+	print(strtr(get_archivetemplate($userid, "monthfooter"), $csere));
 }
 
 // header, monthheader, post, monthfooter v footer lehet. default: post
