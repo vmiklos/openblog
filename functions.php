@@ -336,7 +336,7 @@ function display_archives($usernev)
 
 function display_archivemonth($user, $honap)
 {
-	global $date_format, $site_root;
+	global $date_format, $site_root, $date_format_display;
 	$userid=$user['id'];
 	$query="SELECT * FROM posts WHERE date_format(letrehozas, \"$date_format\" ) = \"$honap\" AND userid =$userid";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
@@ -346,6 +346,12 @@ function display_archivemonth($user, $honap)
 	
 	// a $cuccok lecserelese
 	$csere = array(
+	
+	$query = "SELECT UNIX_TIMESTAMP(letrehozas) FROM posts WHERE id=" . $posts[0]['id'];
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$honap = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	$honap = strftime($date_format_display, $honap['UNIX_TIMESTAMP(letrehozas)']);
 		'$fooldal' => "$site_root/" . $user['name'],
 		'$newurl' => "$site_root/new/" . $user['name'],
 		'$prefsurl' => "$site_root/prefs/" . $user['name'],
