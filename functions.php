@@ -272,6 +272,7 @@ function edit_prefs($usernev)
 				displayname = '" . addslashes(stripslashes($_POST['displayname'])) . "',
 				blogtitle = '" . addslashes(stripslashes($_POST['blogtitle'])) . "',
 				email = '" . addslashes(stripslashes($_POST['email'])) . "',
+				templatetitle = '" . addslashes(stripslashes($_POST['templatetitle'])) . "',
 				template = '" . addslashes(stripslashes($_POST['template'])) . "',
 				`limit` ='" . addslashes(stripslashes($_POST['limit'])) . "'
 				WHERE id =" . $user['id'];
