@@ -86,8 +86,7 @@ adatai azonban ennél nagyságrendekkel "jobb" számokra utalnak.</p>
 
 </div>
 <div id="footer">
-&copy Copyright 2005 OpenBlog.hu<br>Minden jog fenntartva.
-
+<? print($c_text); ?>
 </div>
 
 </div>

@@ -37,7 +37,7 @@ if (!function_exists('file_put_contents'))
 function display_fooldal()
 {
 	global $site_root, $users_limit, $posts_limit, $news_limit,
-		$date_format_fooldalipost;
+		$date_format_fooldalipost, $c_text;
 	
 	$query = "SELECT id, name, displayname FROM users";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
