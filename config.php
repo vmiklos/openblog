@@ -12,4 +12,5 @@ $postcim_lenght = 5;
 $users_limit=5;
 $posts_limit=5;
 $news_limit=3;
+$c_text="<small>&copy Copyright 2005 OpenBlog.hu | Minden jog fenntartva.</small>";
 ?>

@@ -103,7 +103,7 @@ function get_template($id, $type)
 
 function display_user($name)
 {
-	global $site_root;
+	global $site_root, $c_text;
 	$query = "SELECT id, email, displayname, templateid, blogtitle, `limit` FROM users WHERE name='$name'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -124,7 +124,8 @@ function display_user($name)
 		'$nev' => $nick,
 		'$usernev' => $name,
 		'$blogcim' => $user['blogtitle'],
-		'$email' => $user['email']
+		'$email' => $user['email'],
+		'$copyright' => $c_text
 	);
 	
 	print(strtr(get_template($user['templateid'], "header"), $csere));
@@ -296,7 +297,7 @@ function edit_post($postid)
 
 function display_archives($usernev)
 {
-	global $date_format, $site_root;
+	global $date_format, $site_root, $c_text;
 	$query = "SELECT * FROM users WHERE name='$usernev'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -326,7 +327,8 @@ function display_archives($usernev)
 		'$nev' => name2nick($user['name']),
 		'$usernev' => $user['name'],
 		'$blogcim' => $user['blogtitle'],
-		'$email' => $user['email']
+		'$email' => $user['email'],
+		'$copyright' => $c_text
 	);
 	
 	print(strtr(get_archivetemplate($user['id'], "header"), $csere));
