@@ -176,7 +176,7 @@ function display_post($postid, $pure=false)
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$post = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
-	$query = "SELECT name, email, displayname, templateid FROM users WHERE id=" . $post['userid'];
+	$query = "SELECT id, name, email, displayname, templateid FROM users WHERE id=" . $post['userid'];
 	// $result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$result = mysql_query($query) or die("Nincs ilyen post!");
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
