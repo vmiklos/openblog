@@ -104,6 +104,7 @@ function get_template($id, $type)
 
 function display_user($name)
 {
+	global $site_root;
 	$query = "SELECT id, email, displayname, templateid, blogtitle FROM users WHERE name='$name'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -118,6 +119,7 @@ function display_user($name)
 
 	// a $cuccok lecserelese
 	$csere = array(
+		'$fooldal' => "$site_root/index.php/$name",
 		'$nev' => $nick,
 		'$usernev' => $name,
 		'$blogcim' => $user['blogtitle'],
@@ -183,6 +185,7 @@ function display_post($postid, $pure=false)
 	
 	// a $cuccok lecserelese, itt vannak post-specifikus cuccok is
 	$csere = array(
+		'$fooldal' => "$site_root/index.php/" . $user['name'],
 		'$nev' => $name,
 		'$usernev' => $user['name'],
 		'$blogcim' => $user['blogtitle'],

@@ -1,6 +1,7 @@
 $nev
 $blogcim
 $email
+$fooldal - a blogod fõoldala
 $usernev - a felhasználói azonosítód
 
 $posturl
