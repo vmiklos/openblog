@@ -244,6 +244,51 @@ function display_upload_form()
 }
 ?>
 
+function edit_prefs($usernev)
+{
+	global $site_root;
+	
+	if (count($_POST))
+	{
+		$query = "SELECT * FROM users WHERE id=" . $_POST['id'];
+		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		$user = mysql_fetch_array($result, MYSQL_ASSOC);
+		mysql_free_result($result);
+		if ($user['id']==null)
+			die("Nincs ilyen felhaszáló: $usernev");
+		// jelszobekeres
+		if( !isset($_SERVER['PHP_AUTH_USER']) )
+		{
+			header("WWW-Authenticate: Basic realm=\"Bejegyzés létrehozása\"");
+			header('HTTP/1.0 401 Unauthorized');
+			die("A létrehozáshoz jelszó megadása szükséges!");
+		}
+		else
+		{
+			if ($user['name']==$_SERVER['PHP_AUTH_USER'] and 
+				md5($_SERVER['PHP_AUTH_PW'])==$user['passwd'])
+			{
+				$query = "UPDATE users SET
+				displayname = '" . addslashes(stripslashes($_POST['displayname'])) . "',
+				blogtitle = '" . addslashes(stripslashes($_POST['blogtitle'])) . "',
+				email = '" . addslashes(stripslashes($_POST['email'])) . "'
+				WHERE id =" . $user['id'];
+				$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+				include("templates/edit_prefs_done.php");
+			}
+			else
+				die("Nem megfelelõ felhasználónév vagy jelszó!");
+		}
+	}
+	$query = "SELECT * FROM users WHERE name='$usernev'";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	if ($user['id']==null)
+		die("Nincs ilyen felhaszáló: $usernev");
+	include("templates/edit_prefs.php");
+}
+
 function create_post($usernev)
 {
 	global $site_root;

@@ -19,6 +19,8 @@ elseif($command == "delete")
 	delete_post($param);
 elseif($command == "upload")
 	handle_upload($param);
+elseif($command == "prefs")
+	edit_prefs($param);
 elseif(in_array($command, get_users(true)))
 	display_user($command);
 else
