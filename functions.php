@@ -171,17 +171,20 @@ function delete_post($postid)
 function display_post($postid, $pure=false)
 {
 	global $site_root;
-	$date_format='%Y.%m.%d. %H:%i';
 	is_numeric($postid) or die("Nem szám: $postid");
-	$query = "SELECT userid, content, title, letrehozas FROM posts WHERE id=$postid";
+	$query = "SELECT userid, content, title, date_format(letrehozas, '$date_format') FROM posts WHERE id=$postid";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$post = mysql_fetch_array($result, MYSQL_ASSOC);
-	$post['letrehozas']=$post["date_format(letrehozas, '$date_format')"];
 	mysql_free_result($result);
-	$query = "SELECT id, name, email, displayname, templateid FROM users WHERE id=" . $post['userid'];
+	$query = "SELECT id, name, email, displayname FROM users WHERE id=" . $post['userid'];
 	// $result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$result = mysql_query($query) or die("Nincs ilyen post!");
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	$query = "SELECT date_format(letrehozas, '" . $user['date_format'] . "') FROM posts WHERE id=$postid";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$post2=mysql_fetch_array($result, MYSQL_ASSOC);
+	$post['letrehozas']=$post2["date_format(letrehozas, '" . $user['date_format'] . "')"];
 	mysql_free_result($result);
 	if (!is_null($user['displayname']))
 		$post['user']=$user['displayname'];

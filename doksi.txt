@@ -1,3 +1,8 @@
+Beállítások
+===========
+
+Dátum formátum: Itt adhatod meg, hogy milyen formátumban jelenjen meg a bejegyzések ideje. Bõvebb információt itt találsz: http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
+
 Tudnivalók a sablonokról
 ========================
 
