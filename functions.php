@@ -247,6 +247,51 @@ function display_upload_form()
 		include("templates/upload_success.php");
 	}
 }
+
+function edit_post($postid)
+{
+	if (count($_POST))
+	{
+	global $site_root;
+		is_numeric($_POST['postid']) or die("Nem szám: " . $_POST['postid']);
+		$query = "SELECT id, userid, title, content FROM posts WHERE id=" . $_POST['postid'];
+		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		$post = mysql_fetch_array($result, MYSQL_ASSOC);
+		mysql_free_result($result);
+		$query = "SELECT name, passwd FROM users where id=" . $post['userid'];
+		$result = mysql_query($query) or die("Nincs is ilyen bejegyzés!");
+		$user = mysql_fetch_array($result, MYSQL_ASSOC);
+		mysql_free_result($result);
+			if( !isset($_SERVER['PHP_AUTH_USER']) )
+			{
+				header("WWW-Authenticate: Basic realm=\"Bejegyzés szerkesztése\"");
+				header('HTTP/1.0 401 Unauthorized');
+				die("A szerkesztéshez jelszó megadása szükséges!");
+			}
+			else
+			{
+				if ($user['name']==$_SERVER['PHP_AUTH_USER'] and 
+					md5($_SERVER['PHP_AUTH_PW'])==$user['passwd'])
+				{
+					$query = "UPDATE posts SET content = '" . addslashes(stripslashes($_POST['content'])) . "' " .	"WHERE id =" . $_POST['postid'];
+					$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+					print("Betettem!");
+				}
+			else
+				die("Nem megfelelõ felhasználónév vagy jelszó!");
+		}
+	}
+	else
+	{
+		is_numeric($postid) or die("Nem szám: $postid");
+		$query = "SELECT id, userid, title, content FROM posts WHERE id=$postid";
+		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		$post = mysql_fetch_array($result, MYSQL_ASSOC);
+		mysql_free_result($result);
+		include("templates/edit_form.php");
+	}
+}
+
 ?>
 
 function edit_prefs($usernev)
