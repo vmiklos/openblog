@@ -52,6 +52,7 @@ function get_users($strict=false)
 
 function display_users()
 {
+	global $site_root;
 	$users=get_users();
 	include("templates/display_users.php");
 }
