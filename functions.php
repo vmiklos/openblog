@@ -268,6 +268,20 @@ function edit_prefs($usernev)
 			if ($user['name']==$_SERVER['PHP_AUTH_USER'] and 
 				md5($_SERVER['PHP_AUTH_PW'])==$user['passwd'])
 			{
+				if (isset($_POST['newpass']))
+				{
+					if (md5($_POST['newpass']) == md5($_POST['newpass2']))
+					{
+						$query = "UPDATE users SET passwd = '" . md5($_POST['newpass']) . "'
+						WHERE id =" . $user['id'];
+						$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+						header("Location: $site_root/" . $user['name']);
+					}
+					else
+						die('A megadott két jelszó nem azonos!');
+				}
+				else
+				{
 				$query = "UPDATE users SET
 				displayname = '" . addslashes(stripslashes($_POST['displayname'])) . "',
 				blogtitle = '" . addslashes(stripslashes($_POST['blogtitle'])) . "',
@@ -278,6 +292,7 @@ function edit_prefs($usernev)
 				WHERE id =" . $user['id'];
 				$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 				header("Location: $site_root/" . $user['name']);
+				}
 			}
 			else
 				die("Nem megfelelõ felhasználónév vagy jelszó!");

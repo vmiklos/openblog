@@ -13,5 +13,14 @@ print("
 <tr><td><td><input type=\"submit\" value=\"Meg akarok változni!\">
 </table>
 </form>
+<hr>
+Jelszómódosítás
+<form action=\"" . $user['name'] . "\" method=\"post\">
+<input type=hidden name=id value=" . $user['id'] . ">
+<table><tr><td>Új jelszavad:<td><input type=password name=newpass>
+<tr><td>Új jelszavad mégegyszer:<td><input type=password name=newpass2>
+<tr><td><td><input type=\"submit\" value=\"Változtasd!\">
+</table>
+</form>
 ")
 ?>
