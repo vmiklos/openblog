@@ -4,4 +4,9 @@ hm, nezzuk
 - rich text editorban doksi feltoltes ikon + 2 ikon meretevel megnovelni a szeleseget
 - edit utan terjen vissza a folapra
 
+- vmi pofasabb fooldal
+- nehany rendes sablon
+- mod_rewrite-tal rendbetenni az urleket, h ne
+  http://$host/~vmiklos/blog/index.php/vmiklos
+  legyen, hanem, http://$host/vmiklos
 kb ezek ;)
