@@ -177,16 +177,10 @@ function display_upload_form()
 		include("templates/upload_form.php");
 	else
 	{
-		$upload_file = $upload_dir . basename($_FILES['feltoltes']['tmp_name']);
-		if (move_uploaded_file($_FILES['feltoltes']['tmp_name'], $upload_file))
-		{
-			$query="INSERT INTO uploads (name, type, ownerid, data) VALUES('" . $_FILES['feltoltes']['name'] . "', '" . $_FILES['feltoltes']['type'] . "', '1', '" . addslashes(file_get_contents($upload_file)) . "');";
-			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-			include("templates/upload_success.php");
-			unlink($upload_file);
-		}
-		else
-			include("templates/upload_failure.php");
+		$query="INSERT INTO uploads (name, type, ownerid, data) VALUES('" . $_FILES['feltoltes']['name'] . "', '" . $_FILES['feltoltes']['type'] . "', '1', '" . addslashes(file_get_contents($_FILES['feltoltes']['tmp_name'])) . "');";
+		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		include("templates/upload_success.php");
+		unlink($_FILES['feltoltes']['tmp_name']);
 	}
 }
 ?>

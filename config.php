@@ -5,6 +5,5 @@ $mysql_pass = 'ballaballa';
 $mysql_db   = 'openblog';
 
 $site_root  = "/~vmiklos/blog/";
-$upload_dir = "upload/";
 
 ?>
