@@ -17,7 +17,7 @@ $usernev - a felhasználói azonosítód
 $posturl
 $ido
 $newurl - erre kattintva lehet uj postot letrehozni
-$prefsurl - erre kattint módosíthatod a beállításaidat
+$prefsurl - erre kattintva módosíthatod a beállításaidat
 $archiveurl - az archívumodra mutató link
 $post
 <post></post>
