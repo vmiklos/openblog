@@ -171,10 +171,12 @@ function delete_post($postid)
 function display_post($postid, $pure=false)
 {
 	global $site_root;
+	$date_format='%Y.%m.%d. %H:%i';
 	is_numeric($postid) or die("Nem szám: $postid");
-	$query = "SELECT userid, content, letrehozas FROM posts WHERE id=$postid";
+	$query = "SELECT userid, content, title, letrehozas FROM posts WHERE id=$postid";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$post = mysql_fetch_array($result, MYSQL_ASSOC);
+	$post['letrehozas']=$post["date_format(letrehozas, '$date_format')"];
 	mysql_free_result($result);
 	$query = "SELECT id, name, email, displayname, templateid FROM users WHERE id=" . $post['userid'];
 	// $result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
