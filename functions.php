@@ -282,16 +282,16 @@ function edit_prefs($usernev)
 				}
 				else
 				{
-				$query = "UPDATE users SET
-				displayname = '" . addslashes(stripslashes($_POST['displayname'])) . "',
-				blogtitle = '" . addslashes(stripslashes($_POST['blogtitle'])) . "',
-				email = '" . addslashes(stripslashes($_POST['email'])) . "',
-				templatetitle = '" . addslashes(stripslashes($_POST['templatetitle'])) . "',
-				template = '" . addslashes(stripslashes($_POST['template'])) . "',
-				`limit` ='" . addslashes(stripslashes($_POST['limit'])) . "'
-				WHERE id =" . $user['id'];
-				$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-				header("Location: $site_root/" . $user['name']);
+					$query = "UPDATE users SET
+					displayname = '" . addslashes(stripslashes($_POST['displayname'])) . "',
+					blogtitle = '" . addslashes(stripslashes($_POST['blogtitle'])) . "',
+					email = '" . addslashes(stripslashes($_POST['email'])) . "',
+					templatetitle = '" . addslashes(stripslashes($_POST['templatetitle'])) . "',
+					template = '" . addslashes(stripslashes($_POST['template'])) . "',
+					`limit` ='" . addslashes(stripslashes($_POST['limit'])) . "'
+					WHERE id =" . $user['id'];
+					$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+					header("Location: $site_root/" . $user['name']);
 				}
 			}
 			else
