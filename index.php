@@ -13,6 +13,8 @@ if ($command == "")
 	display_users();
 elseif($command == "posts")
 	display_post($param);
+elseif($command == "delete")
+	delete_post($param);
 elseif($command == "upload")
 	handle_upload($param);
 elseif(in_array($command, get_users(true)))

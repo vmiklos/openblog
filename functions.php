@@ -125,11 +125,44 @@ function display_user($name)
 	
 	print(strtr(get_template($user['templateid'], "header"), $csere));
 	foreach($posts as $i)
-		display_post($i);
+		display_post($i, true);
 	print(strtr(get_template($user['templateid'], "footer"), $csere));
 }
 
-function display_post($postid)
+function delete_post($postid)
+{
+	is_numeric($postid) or die("Nem szám: $postid");
+	$query = "SELECT userid FROM posts WHERE id=$postid";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$post = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	$query = "SELECT name, passwd FROM users where id=" . $post['userid'];
+	$result = mysql_query($query) or die("Nincs is ilyen bejegyzés!");
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	if( !isset($_SERVER['PHP_AUTH_USER']) )
+	{
+		header("WWW-Authenticate: Basic realm=\"Bejegyzés törlése\"");
+		header('HTTP/1.0 401 Unauthorized');
+		die("A törléshez jelszó megadása szükséges!");
+	}
+	else
+	{
+		if ($user['name']==$_SERVER['PHP_AUTH_USER'] and 
+			md5($_SERVER['PHP_AUTH_PW'])==$user['passwd'])
+		{
+			$query = "DELETE FROM posts WHERE id=" . $postid;
+			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+			print("Töröltem!");
+		}
+		else
+			die("Nem megfelelõ felhasználónév vagy jelszó!");
+	}
+}
+
+// ha pure true, akkor nincs header meg footer
+
+function display_post($postid, $pure=false)
 {
 	global $site_root;
 	is_numeric($postid) or die("Nem szám: $postid");
@@ -153,11 +186,16 @@ function display_post($postid)
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
 		'$posturl' => $_SERVER["SCRIPT_NAME"] . "/posts/$postid",
+		'$deleteurl' => $_SERVER["SCRIPT_NAME"] . "/delete/$postid",
 		'$ido' => $post['letrehozas'],
 		'$post' => $post['content']
 	);
 	
+	if (!$pure)
+		print(strtr(get_template($user['templateid'], "header"), $csere));
 	print(strtr(get_template($user['templateid'], "post"), $csere));
+	if (!$pure)
+		print(strtr(get_template($user['templateid'], "footer"), $csere));
 }
 
 function handle_upload($input)

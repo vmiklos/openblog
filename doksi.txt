@@ -6,3 +6,5 @@ $posturl
 $ido
 $post
 <post></post>
+
+$deleteurl - törlõ url-je a postnak
