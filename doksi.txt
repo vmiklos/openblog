@@ -1,0 +1,8 @@
+$nev
+$blogcim
+$email
+
+$posturl
+$ido
+$post
+<post></post>
