@@ -120,6 +120,7 @@ function display_user($name)
 	// a $cuccok lecserelese
 	$csere = array(
 		'$fooldal' => "$site_root/index.php/$name",
+		'$newurl' => "$site_root/index.php/new/$name",
 		'$nev' => $nick,
 		'$usernev' => $name,
 		'$blogcim' => $user['blogtitle'],
@@ -186,6 +187,7 @@ function display_post($postid, $pure=false)
 	// a $cuccok lecserelese, itt vannak post-specifikus cuccok is
 	$csere = array(
 		'$fooldal' => "$site_root/index.php/" . $user['name'],
+		'$newurl' => "$site_root/index.php/new/" . $user['name'],
 		'$nev' => $name,
 		'$usernev' => $user['name'],
 		'$blogcim' => $user['blogtitle'],

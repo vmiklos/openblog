@@ -6,6 +6,7 @@ $usernev - a felhasználói azonosítód
 
 $posturl
 $ido
+$newurl - erre kattintva lehet uj postot letrehozni
 $post
 <post></post>
 
