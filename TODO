@@ -6,7 +6,4 @@ hm, nezzuk
 
 - vmi pofasabb fooldal
 - nehany rendes sablon
-- mod_rewrite-tal rendbetenni az urleket, h ne
-  http://$host/~vmiklos/blog/index.php/vmiklos
-  legyen, hanem, http://$host/vmiklos
 kb ezek ;)
