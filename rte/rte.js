@@ -140,6 +140,7 @@ function writeRichText(rte, html, width, height, buttons, readOnly) {
 			document.writeln('		<td><img class="rteVertSep" src="' + imagesPath + 'blackdot.gif" width="1" height="20" border="0" alt=""></td>');
 			document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'hyperlink.gif" width="25" height="24" alt="Link beszúrása" title="Link beszúrása" onClick="dlgInsertLink(\'' + rte + '\', \'link\')"></td>');
 			document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'image.gif" width="25" height="24" alt="Kép hozzáadása" title="Kép hozzáadása" onClick="addImage(\'' + rte + '\')"></td>');
+			if (isIE) {
 			document.writeln('		<td><div id="table_' + rte + '"><img class="rteImage" src="' + imagesPath + 'insert_table.gif" width="25" height="24" alt="Táblázat beszúrása" title="Táblázat beszúrása" onClick="dlgInsertTable(\'' + rte + '\', \'table\', \'\')"></div></td>');
 			if (isIE) {
 				document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'spellcheck.gif" width="25" height="24" alt="Spell Check" title="Spell Check" onClick="checkspell()"></td>');
