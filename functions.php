@@ -108,7 +108,7 @@ function display_user($name)
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
-	$name=name2nick($name);
+	$nick=name2nick($name);
 
 	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "' ORDER BY letrehozas DESC";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
@@ -118,7 +118,8 @@ function display_user($name)
 
 	// a $cuccok lecserelese
 	$csere = array(
-		'$nev' => $name,
+		'$nev' => $nick,
+		'$usernev' => $name,
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email']
 	);
@@ -183,6 +184,7 @@ function display_post($postid, $pure=false)
 	// a $cuccok lecserelese, itt vannak post-specifikus cuccok is
 	$csere = array(
 		'$nev' => $name,
+		'$usernev' => $user['name'],
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
 		'$posturl' => $_SERVER["SCRIPT_NAME"] . "/posts/$postid",

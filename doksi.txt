@@ -1,6 +1,7 @@
 $nev
 $blogcim
 $email
+$usernev - a felhasználói azonosítód
 
 $posturl
 $ido
