@@ -10,7 +10,7 @@ if (strpos($_SERVER["PATH_INFO"], "/") !== false)
 $param = preg_replace('|^[^/]*/([^/]*)|', '$1', substr($_SERVER["PATH_INFO"], 1));
 
 if ($command == "")
-	display_users();
+	display_fooldal();
 elseif($command == "new")
 	create_post($param);
 elseif($command == "posts")

@@ -9,4 +9,7 @@ $date_format='%Y%m';
 
 setlocale (LC_TIME, "hu_HU");
 $postcim_lenght = 5;
+$users_limit=5;
+$posts_limit=5;
+$news_limit=3;
 ?>

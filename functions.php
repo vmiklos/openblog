@@ -34,27 +34,20 @@ if (!function_exists('file_put_contents'))
 	}
 }
 
-// ha true, akkor nicket nem ad
-function get_users($strict=false)
+function display_fooldal()
 {
-	$query = 'SELECT name, displayname FROM users';
+	global $site_root, $users_limit, $posts_limit, $news_limit;
+	$query = "SELECT id, name, displayname, blogtitle, email, registration_date FROM users ORDER BY registration_date DESC LIMIT $users_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
-	{
-		if (!is_null($i['displayname']) and $strict==false)
-			$users[]=$i['displayname'];
-		else
-			$users[]=$i['name'];
-	}
+		$users[]=$i;
 	mysql_free_result($result);
-	return ($users);
-}
-
-function display_users()
-{
-	global $site_root;
-	$users=get_users();
-	include("templates/display_users.php");
+	$query = "SELECT id, userid, title, letrehozas FROM posts ORDER BY letrehozas DESC LIMIT $posts_limit";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$posts[]=$i;
+	mysql_free_result($result);
+	include("templates/fooldal.php");
 }
 
 function name2nick($input)
