@@ -58,7 +58,7 @@ function display_fooldal()
 		$posts[]=$i;
 	}
 	mysql_free_result($result);
-	$query = "SELECT id, cim, content, authorid, date_format(letrehozas, '$date_format_hir') FROM news ORDER BY letrehozas DESC LIMIT $news_limit";
+	$query = "SELECT id, cim, content, authorid, date_format(letrehozas, '$date_format_hir') FROM news WHERE active=1 ORDER BY letrehozas DESC LIMIT $news_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 	{
