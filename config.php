@@ -4,6 +4,7 @@ $mysql_user = 'openblog';
 $mysql_pass = 'ballaballa';
 $mysql_db   = 'openblog';
 
-$site_root= "/~vmiklos/blog/";
+$site_root  = "/~vmiklos/blog/";
+$upload_dir = "upload/";
 
 ?>

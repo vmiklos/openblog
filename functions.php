@@ -7,6 +7,33 @@ function vd($input)
 	print("</pre>");
 }
 
+if (!function_exists('file_get_contents')) 
+{ 
+	function file_get_contents($filename, $use_include_path = 0) 
+	{ 
+		$file = @fopen($filename, 'rb', $use_include_path); 
+		$data = "";
+		if ($file) 
+		{ 
+			while (!feof($file)) $data .= fread($file, 1024); 
+			fclose($file); 
+		} 
+		return $data; 
+	} 
+}
+
+if (!function_exists('file_put_contents'))
+{
+	define('FILE_APPEND', 1);
+	function file_put_contents($filename, $content, $flags = 0)
+	{
+		if (!($file = fopen($filename, ($flags & FILE_APPEND) ? 'a' : 'w'))) return false;
+		$n = fwrite($file, $content);
+		fclose($file);
+		return $n ? $n : false;
+	}
+}
+
 // ha true, akkor nicket nem ad
 function get_users($strict=false)
 {
@@ -83,7 +110,7 @@ function display_user($name)
 	mysql_free_result($result);
 	$name=name2nick($name);
 
-	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "'";
+	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "' ORDER BY letrehozas DESC";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$posts[] = $i['id'];
@@ -133,4 +160,33 @@ function display_post($postid)
 	print(strtr(get_template($user['templateid'], "post"), $csere));
 }
 
+function handle_upload($input)
+{
+	if (!is_numeric($input))
+		display_upload_form();
+	else
+	{
+		print("kene a $input., mi? ;)");
+	}
+}
+
+function display_upload_form()
+{
+	global $upload_dir;
+	if (!count($_FILES))
+		include("templates/upload_form.php");
+	else
+	{
+		$upload_file = $upload_dir . basename($_FILES['feltoltes']['tmp_name']);
+		if (move_uploaded_file($_FILES['feltoltes']['tmp_name'], $upload_file))
+		{
+			$query="INSERT INTO uploads (name, type, ownerid, data) VALUES('" . $_FILES['feltoltes']['name'] . "', '" . $_FILES['feltoltes']['type'] . "', '1', '" . addslashes(file_get_contents($upload_file)) . "');";
+			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+			include("templates/upload_success.php");
+			unlink($upload_file);
+		}
+		else
+			include("templates/upload_failure.php");
+	}
+}
 ?>
