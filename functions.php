@@ -294,6 +294,44 @@ function edit_post($postid)
 
 ?>
 
+function display_archives($usernev)
+{
+	global $date_format;
+	$query = "SELECT * FROM users WHERE name='$usernev'";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	
+	if ($user['id']==null)
+		die("Nincs ilyen felhaszáló: $usernev");
+	$query = "SELECT id, title, content, date_format(letrehozas, \"$date_format\") FROM posts WHERE userid=" . $user['id'];
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$posts[] = $i;
+	mysql_free_result($result);
+	foreach ($posts as $key => $value)
+		$posts[$key]['letrehozas'] = 
+			$value["date_format(letrehozas, \"$date_format\")"];
+	$honapok = array();
+	foreach($posts as $i)
+		if (!in_array($i['letrehozas'], $honapok))
+			$honapok[]=$i['letrehozas'];
+	foreach($honapok as $i)
+		display_archivemonth($user['id'], $i);
+}
+
+function display_archivemonth($userid, $honap)
+{
+	global $date_format;
+	print("megjelenitem $userid-nek $honap-t, jol<br>\n");
+	$query="SELECT * FROM posts WHERE date_format(letrehozas, \"$date_format\" ) = \"$honap\" AND userid =$userid";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$posts[] = $i;
+	mysql_free_result($result);
+	vd($posts);
+}
+
 function edit_prefs($usernev)
 {
 	global $site_root;
