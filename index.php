@@ -11,6 +11,8 @@ $param = preg_replace('|^[^/]*/([^/]*)|', '$1', substr($_SERVER["PATH_INFO"], 1)
 
 if ($command == "")
 	display_users();
+elseif($command == "new")
+	create_post($param);
 elseif($command == "posts")
 	display_post($param);
 elseif($command == "delete")

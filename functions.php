@@ -239,3 +239,36 @@ function display_upload_form()
 	}
 }
 ?>
+
+function create_post($usernev)
+{
+	global $site_root;
+	
+	$query = "SELECT * FROM users WHERE name='$usernev'";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	if ($user['id']==null)
+		die("Nincs ilyen felhaszáló: $usernev");
+	// jelszobekeres
+	if( !isset($_SERVER['PHP_AUTH_USER']) )
+	{
+		header("WWW-Authenticate: Basic realm=\"Bejegyzés létrehozása\"");
+		header('HTTP/1.0 401 Unauthorized');
+		die("A létrehozáshoz jelszó megadása szükséges!");
+	}
+	else
+	{
+		if ($user['name']==$_SERVER['PHP_AUTH_USER'] and 
+			md5($_SERVER['PHP_AUTH_PW'])==$user['passwd'])
+		{
+			$query = " INSERT INTO posts
+			(userid, title, content, letrehozas)
+			VALUES ('" . $user['id'] . "', NULL , '', NOW())";
+			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+			header("Location: $site_root/index.php/edit/" . mysql_insert_id());
+		}
+		else
+			die("Nem megfelelõ felhasználónév vagy jelszó!");
+	}
+}
