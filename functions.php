@@ -111,7 +111,7 @@ function display_user($name)
 	$nick=name2nick($name);
 
 	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "' ORDER BY letrehozas DESC LIMIT " . $user['limit'];
-	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$result = mysql_query($query) or die("Ismeretlen felhasználó: $name");
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$posts[] = $i['id'];
 	mysql_free_result($result);
