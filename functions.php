@@ -316,20 +316,73 @@ function display_archives($usernev)
 	foreach($posts as $i)
 		if (!in_array($i['letrehozas'], $honapok))
 			$honapok[]=$i['letrehozas'];
+			
+	// a $cuccok lecserelese
+	$csere = array(
+		'$fooldal' => "$site_root/" . $user['name'],
+		'$newurl' => "$site_root/new/" . $user['name'],
+		'$prefsurl' => "$site_root/prefs/" . $user['name'],
+		'$nev' => name2nick($user['name']),
+		'$usernev' => $user['name'],
+		'$blogcim' => $user['blogtitle'],
+		'$email' => $user['email']
+	);
+	
+	print(strtr(get_archivetemplate($user['id'], "header"), $csere));
 	foreach($honapok as $i)
 		display_archivemonth($user['id'], $i);
+	print(strtr(get_archivetemplate($user['id'], "footer"), $csere));
 }
 
 function display_archivemonth($userid, $honap)
 {
 	global $date_format;
-	print("megjelenitem $userid-nek $honap-t, jol<br>\n");
 	$query="SELECT * FROM posts WHERE date_format(letrehozas, \"$date_format\" ) = \"$honap\" AND userid =$userid";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$posts[] = $i;
 	mysql_free_result($result);
-	vd($posts);
+	print(get_archivetemplate($userid, "monthheader"));
+	foreach($posts as $i)
+		print(get_archivetemplate($userid, "post"));
+	print(get_archivetemplate($userid, "monthfooter"));
+}
+
+// header, monthheader, post, monthfooter v footer lehet. default: post
+
+function get_archivetemplate($id, $type)
+{
+	$query = "SELECT archivetemplate from users WHERE id='$id'";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	
+	switch ($type)
+	{
+	case "header":
+		$less = explode("<month>", $user['archivetemplate']);
+		return $less[0];
+		break;
+	case "monthheader":
+		$less = explode("<month>", $user['archivetemplate']);
+		$eless = explode("<post>", $less[1]);
+		return $eless[0];
+		break;
+	case "post":
+		$less = explode("<post>", $user['archivetemplate']);
+		$eless = explode("</post>", $less[1]);
+		return $eless[0];
+		break;
+	case "monthfooter":
+		$less = explode("</month>", $user['archivetemplate']);
+		$eless = explode("</post>", $less[0]);
+		return $eless[1];
+		break;
+	case "footer":
+		$less = explode("</month>", $user['archivetemplate']);
+		return $less[1];
+		break;
+	}
 }
 
 function edit_prefs($usernev)
