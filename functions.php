@@ -37,7 +37,7 @@ if (!function_exists('file_put_contents'))
 function display_fooldal()
 {
 	global $site_root, $users_limit, $posts_limit, $news_limit,
-		$date_format_fooldalipost, $c_text;
+		$date_format_fooldalipost, $date_format_hir, $c_text;
 	
 	$query = "SELECT id, name, displayname FROM users";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
@@ -58,11 +58,12 @@ function display_fooldal()
 		$posts[]=$i;
 	}
 	mysql_free_result($result);
-	$query = "SELECT id, cim, content, authorid FROM news ORDER BY letrehozas DESC LIMIT $news_limit";
+	$query = "SELECT id, cim, content, authorid, date_format(letrehozas, '$date_format_hir') FROM news ORDER BY letrehozas DESC LIMIT $news_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 	{
 		$i['author']=name2nick($userdb[$i['authorid']]['name']);
+		$i['letrehozas']=$i["date_format(letrehozas, '$date_format_hir')"];
 		$news[]=$i;
 	}
 	mysql_free_result($result);

@@ -8,6 +8,7 @@ $site_root  = ""; // ~vmiklos/openblog lehetne pl
 $date_format='%Y %M'; // YYYYMM ez alapjan bontom a bejegyzeseket honapokra
 $date_format_display="%Y %B"; // 2004 Marcius, igy jelenik meg a honap
 			      // TODO: ezt a user a prefsben kene tudja allitsa
+$date_format_fooldalipost = "%H:%i";
 
 setlocale (LC_TIME, "hu_HU");
 $postcim_lenght = 5;
