@@ -271,7 +271,8 @@ function edit_prefs($usernev)
 				$query = "UPDATE users SET
 				displayname = '" . addslashes(stripslashes($_POST['displayname'])) . "',
 				blogtitle = '" . addslashes(stripslashes($_POST['blogtitle'])) . "',
-				email = '" . addslashes(stripslashes($_POST['email'])) . "'
+				email = '" . addslashes(stripslashes($_POST['email'])) . "',
+				`limit` ='" . addslashes(stripslashes($_POST['limit'])) . "'
 				WHERE id =" . $user['id'];
 				$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 				include("templates/edit_prefs_done.php");
