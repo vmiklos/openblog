@@ -18,6 +18,7 @@ $posturl
 $ido
 $newurl - erre kattintva lehet uj postot letrehozni
 $prefsurl - erre kattint módosíthatod a beállításaidat
+$archiveurl - az archívumodra mutató link
 $post
 <post></post>
 

@@ -121,6 +121,7 @@ function display_user($name)
 	// a $cuccok lecserelese
 	$csere = array(
 		'$fooldal' => "$site_root/$name",
+		'$archiveurl' => "$site_root/archives/$name",
 		'$newurl' => "$site_root/new/$name",
 		'$nev' => $nick,
 		'$usernev' => $name,
@@ -194,6 +195,7 @@ function display_post($postid, $pure=false)
 	// a $cuccok lecserelese, itt vannak post-specifikus cuccok is
 	$csere = array(
 		'$fooldal' => "$site_root/" . $user['name'],
+		'$archiveurl' => "$site_root/archives/" . $user['name'],
 		'$newurl' => "$site_root/new/" . $user['name'],
 		'$nev' => $name,
 		'$usernev' => $user['name'],
@@ -320,6 +322,7 @@ function display_archives($usernev)
 	// a $cuccok lecserelese
 	$csere = array(
 		'$fooldal' => "$site_root/" . $user['name'],
+		'$archiveurl' => "$site_root/archives/" . $user['name'],
 		'$newurl' => "$site_root/new/" . $user['name'],
 		'$prefsurl' => "$site_root/prefs/" . $user['name'],
 		'$nev' => name2nick($user['name']),
@@ -356,6 +359,7 @@ function display_archivemonth($user, $honap)
 		'$newurl' => "$site_root/new/" . $user['name'],
 		'$prefsurl' => "$site_root/prefs/" . $user['name'],
 		'$nev' => name2nick($user['name']),
+		'$archiveurl' => "$site_root/archives/" . $user['name'],
 		'$usernev' => $user['name'],
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
@@ -371,6 +375,7 @@ function display_archivemonth($user, $honap)
 // header, monthheader, post, monthfooter v footer lehet. default: post
 
 function get_archivetemplate($id, $type)
+			'$archiveurl' => "$site_root/archives/" . $user['name'],
 {
 	$query = "SELECT archivetemplate from users WHERE id='$id'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
