@@ -166,7 +166,14 @@ function handle_upload($input)
 		display_upload_form();
 	else
 	{
-		print("kene a $input., mi? ;)");
+		$query = "SELECT name, type, data FROM uploads WHERE id=" . $input;
+		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		$upload = mysql_fetch_array($result, MYSQL_ASSOC) or die('Nincs ilyen feltölés!');
+		mysql_free_result($result);
+		header("Content-Type: " . $upload['type']);
+		header("Content-Length: " . strlen($upload['data']));
+		header("Content-Disposition: attachment; filename=\"" . $upload['name']. "\"");
+		print($upload['data']);
 	}
 }
 
@@ -179,8 +186,13 @@ function display_upload_form()
 	{
 		$query="INSERT INTO uploads (name, type, ownerid, data) VALUES('" . $_FILES['feltoltes']['name'] . "', '" . $_FILES['feltoltes']['type'] . "', '1', '" . addslashes(file_get_contents($_FILES['feltoltes']['tmp_name'])) . "');";
 		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		if(!@unlink($_FILES['feltoltes']['tmp_name']))
+		{
+			$query="delete from uploads where id=" . mysql_insert_id();
+			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' .mysql_error());
+			die("Túl nagy a feltölteni kívánt file!");
+		}
 		include("templates/upload_success.php");
-		unlink($_FILES['feltoltes']['tmp_name']);
 	}
 }
 ?>
