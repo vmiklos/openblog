@@ -106,13 +106,13 @@ function get_template($id, $type)
 function display_user($name)
 {
 	global $site_root;
-	$query = "SELECT id, email, displayname, templateid, blogtitle FROM users WHERE name='$name'";
+	$query = "SELECT id, email, displayname, templateid, blogtitle, `limit` FROM users WHERE name='$name'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
 	$nick=name2nick($name);
 
-	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "' ORDER BY letrehozas DESC";
+	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "' ORDER BY letrehozas DESC LIMIT " . $user['limit'];
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$posts[] = $i['id'];
