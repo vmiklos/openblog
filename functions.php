@@ -293,6 +293,7 @@ function edit_prefs($usernev)
 					email = '" . addslashes(stripslashes($_POST['email'])) . "',
 					templatetitle = '" . addslashes(stripslashes($_POST['templatetitle'])) . "',
 					template = '" . addslashes(stripslashes($_POST['template'])) . "',
+					date_format = '" . addslashes(stripslashes($_POST['date_format'])) . "',
 					`limit` ='" . addslashes(stripslashes($_POST['limit'])) . "'
 					WHERE id =" . $user['id'];
 					$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
