@@ -272,6 +272,7 @@ function edit_prefs($usernev)
 				displayname = '" . addslashes(stripslashes($_POST['displayname'])) . "',
 				blogtitle = '" . addslashes(stripslashes($_POST['blogtitle'])) . "',
 				email = '" . addslashes(stripslashes($_POST['email'])) . "',
+				templateid = '" . addslashes(stripslashes($_POST['templateid'])) . "',
 				`limit` ='" . addslashes(stripslashes($_POST['limit'])) . "'
 				WHERE id =" . $user['id'];
 				$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
@@ -285,8 +286,15 @@ function edit_prefs($usernev)
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
+	
 	if ($user['id']==null)
 		die("Nincs ilyen felhaszáló: $usernev");
+
+	$query = "SELECT id, nev FROM templates";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$templates[]= array($i['id'], $i['nev']);
+	
 	include("templates/edit_prefs.php");
 }
 
