@@ -7,7 +7,9 @@ print("
 <tr><td>Blogod címe:<td><input type=text name=blogtitle value=\"" . $user['blogtitle'] . "\"><br>
 <tr><td>Email címed:<td><input type=text name=email value=\"" . $user['email'] . "\"><br>
 <tr><td>Bejegyzések a fõoldalon:<td><input type=text name=limit value=\"" . $user['limit'] . "\"><br>
-<tr><td><input type=\"submit\" value=\"Meg akarok változni!\">
+<tr><td valign=top>Sablon:<td><textarea cols=80 rows=20 name=\"template\">
+" . $user['template'] . "</textarea><br>
+<tr><td><td><input type=\"submit\" value=\"Meg akarok változni!\">
 </table>
 </form>
 ")
