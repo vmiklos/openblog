@@ -21,6 +21,8 @@ elseif($command == "upload")
 	handle_upload($param);
 elseif($command == "prefs")
 	edit_prefs($param);
+elseif($command == "register")
+	handle_register($param);
 elseif($command == "archives")
 	display_archives($param);
 else

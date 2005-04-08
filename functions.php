@@ -540,3 +540,26 @@ function create_post($usernev)
 			die("Nem megfelelõ felhasználónév vagy jelszó!");
 	}
 }
+
+function handle_register($theme)
+{
+	$query = 'SELECT * FROM `users` where `templatescrore`>5 LIMIT 0, 30';
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$templates[] = $i;
+	mysql_free_result($result);
+	$valid=false;
+	foreach($templates as $i)
+		if($i['id']==$theme)
+			$valid=true;
+	if ($theme=="register")
+	{
+		include("templates/reg_select.php");
+	}
+	elseif (!$valid)
+		die("Nem választható ilyen téma!");
+	else
+	{
+		print("ok");
+	}
+}
