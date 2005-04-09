@@ -563,3 +563,11 @@ function handle_register($theme)
 		print("ok");
 	}
 }
+			$query = "SELECT * FROM users WHERE name='" . addslashes(stripslashes($_POST['name'])) . "'";
+			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+			if (mysql_num_rows($result)!=0)
+			{
+				$hiba="A megadott név már foglalt!";
+				include("templates/reg_failure.php");
+				die();
+			}
