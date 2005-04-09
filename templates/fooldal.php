@@ -13,6 +13,12 @@
 <div id="left">
 <div class="box">
 <h3>Új felhasználók ></h3>
+<h3>Regisztráció ></h3>
+<ul>
+<li><a href="/register">Szeretnék saját blogot</a></li>
+</ul>
+</div>
+<div class="box">
 
 <ul>
 <?
