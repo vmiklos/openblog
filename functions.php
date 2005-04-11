@@ -177,7 +177,11 @@ function delete_post($postid)
 			header("Location: $site_root/index.php/" . $user['name']);
 		}
 		else
+		{
+			$realm = mt_rand( 1, 1000000000 );
+			header( 'WWW-Authenticate: Basic realm='.$realm );
 			die("Nem megfelelõ felhasználónév vagy jelszó!");
+		}
 	}
 }
 
@@ -297,7 +301,11 @@ function edit_post($postid)
 				die("Nem megfelelõ felhasználónév vagy jelszó!");
 		}
 	}
+			{
+				$realm = mt_rand( 1, 1000000000 );
+				header( 'WWW-Authenticate: Basic realm='.$realm );
 	else
+			}
 	{
 		is_numeric($postid) or die("Nem szám: $postid");
 		$query = "SELECT id, userid, title, content FROM posts WHERE id=$postid";
@@ -523,7 +531,11 @@ function create_post($usernev)
 	{
 		header("WWW-Authenticate: Basic realm=\"Bejegyzés létrehozása\"");
 		header('HTTP/1.0 401 Unauthorized');
+			{
+				$realm = mt_rand( 1, 1000000000 );
+				header( 'WWW-Authenticate: Basic realm='.$realm );
 		die("A létrehozáshoz jelszó megadása szükséges!");
+			}
 	}
 	else
 	{
@@ -563,6 +575,11 @@ function handle_register($theme)
 		print("ok");
 	}
 }
+			if (md5($_POST['passwd'])!=md5($_POST['passwd2']))
+			{
+				include("templates/reg_failure.php");
+				die();
+			}
 			$query = "SELECT * FROM users WHERE name='" . addslashes(stripslashes($_POST['name'])) . "'";
 			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 			if (mysql_num_rows($result)!=0)
