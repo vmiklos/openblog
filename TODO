@@ -1,6 +1,7 @@
 hm, nezzuk
-- engine design: prefs, post
-- helpek: reg_form, prefs, post
+- engine design: post
+- helpek: prefs, post
+- http header kuldese rossz jelszonal
 - archivum
 - banner kezeles
 
