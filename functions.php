@@ -588,3 +588,15 @@ function handle_register($theme)
 				include("templates/reg_failure.php");
 				die();
 			}
+			if($_POST['name'] == "")
+			{
+				$hiba="A felhasználónév megadása kötelezõ!";
+				include("templates/reg_failure.php");
+				die();
+			}
+			if(!preg_match("/^[a-zA-Z0-9]+$/", $_POST['name']))
+			{
+				$hiba="A loginnév csak ékezetmentes kis és nagybetûket, valamint számokat tartalmazhat!";
+				include("templates/reg_failure.php");
+				die();
+			}
