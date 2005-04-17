@@ -29,3 +29,4 @@ Jelszómódosítás
 ?>
 
 <li>$szamlalo - annyit mutat, ahanyszor meglatogattak a blogod
+<li>$postszam - az összes bejegyzésed száma
