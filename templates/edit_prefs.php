@@ -27,3 +27,5 @@ Jelszómódosítás
 </form>
 ")
 ?>
+
+<li>$szamlalo - annyit mutat, ahanyszor meglatogattak a blogod

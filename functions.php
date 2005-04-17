@@ -119,10 +119,11 @@ function get_template($id, $type)
 function display_user($name)
 {
 	global $site_root, $c_text;
-	$query = "SELECT id, email, displayname, templateid, blogtitle, `limit` FROM users WHERE name='$name'";
+	$query = "SELECT id, email, displayname, blogtitle, `limit` FROM users WHERE name='$name'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
+	push_user($user['id'], $user['hits']);
 	$nick=name2nick($name);
 
 	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "' ORDER BY letrehozas DESC LIMIT " . $user['limit'];
@@ -140,6 +141,7 @@ function display_user($name)
 		'$usernev' => $name,
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
+		'$szamlalo' => $user['hits'],
 		'$copyright' => $c_text
 	);
 	
@@ -195,11 +197,13 @@ function display_post($postid, $pure=false)
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$post = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
-	$query = "SELECT id, name, email, displayname FROM users WHERE id=" . $post['userid'];
+	$query = "SELECT id, name, email, displayname, date_format, blogtitle FROM users WHERE id=" . $post['userid'];
 	// $result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$result = mysql_query($query) or die("Nincs ilyen post!");
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
+	if ($pure==false)
+		push_user($user['id'], $user['hits']);
 	$query = "SELECT date_format(letrehozas, '" . $user['date_format'] . "') FROM posts WHERE id=$postid";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$post2=mysql_fetch_array($result, MYSQL_ASSOC);
@@ -219,6 +223,7 @@ function display_post($postid, $pure=false)
 		'$usernev' => $user['name'],
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
+		'$szamlalo' => $user['hits'],
 		'$posturl' => $_SERVER["SCRIPT_NAME"] . "/posts/$postid",
 		'$deleteurl' => $_SERVER["SCRIPT_NAME"] . "/delete/$postid",
 		'$ido' => $post['letrehozas'],
@@ -352,6 +357,7 @@ function display_archives($usernev)
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
 		'$copyright' => $c_text
+		'$szamlalo' => $user['hits'],
 	);
 	
 	print(strtr(get_archivetemplate($user['id'], "header"), $csere));
@@ -407,6 +413,7 @@ function display_archivemonth($user, $honap)
 			$i['title']=first_words($i['content']);
 		
 // header, monthheader, post, monthfooter v footer lehet. default: post
+		'$szamlalo' => $user['hits'],
 
 function get_archivetemplate($id, $type)
 			'$archiveurl' => "$site_root/archives/" . $user['name'],
@@ -427,6 +434,7 @@ function get_archivetemplate($id, $type)
 		$eless = explode("<post>", $less[1]);
 		return $eless[0];
 		break;
+			'$szamlalo' => $user['hits'],
 	case "post":
 		$less = explode("<post>", $user['archivetemplate']);
 		$eless = explode("</post>", $less[1]);
@@ -609,3 +617,9 @@ function click_ad($id)
 	mysql_free_result($result);
 	header("Location: " . $ad['url']);
 }
+}
+
+function push_user($id, $current)
+{
+	$query = "UPDATE users SET hits=" . ($current+1) . " WHERE id=" . $id;
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
