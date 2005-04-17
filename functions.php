@@ -600,3 +600,12 @@ function handle_register($theme)
 				include("templates/reg_failure.php");
 				die();
 			}
+
+function click_ad($id)
+{
+	$query = "SELECT url, clicks FROM ads WHERE id=" . $id;
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$ad = mysql_fetch_array($result, MYSQL_ASSOC) or die('Nincs ilyen reklám!');
+	mysql_free_result($result);
+	header("Location: " . $ad['url']);
+}
