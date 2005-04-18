@@ -123,11 +123,11 @@ function display_user($name)
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
-	push_user($user['id'], $user['hits']);
 	$nick=name2nick($name);
 
 	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "' ORDER BY letrehozas DESC LIMIT " . $user['limit'];
 	$result = mysql_query($query) or die("Ismeretlen felhasználó: $name");
+	push_user($user['id'], $user['hits']);
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$posts[] = $i['id'];
 	mysql_free_result($result);
