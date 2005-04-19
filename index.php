@@ -13,6 +13,8 @@ if ($command == "")
 	display_fooldal();
 elseif($command == "new")
 	create_post($param);
+elseif($command == "news")
+	display_fooldal($param);
 elseif($command == "posts")
 	display_post($param);
 elseif($command == "delete")

@@ -34,7 +34,7 @@ if (!function_exists('file_put_contents'))
 	}
 }
 
-function display_fooldal()
+function display_fooldal($id=null)
 {
 	global $site_root, $users_limit, $posts_limit, $news_limit,
 		$date_format_fooldalipost, $date_format_hir, $c_text;
@@ -58,7 +58,10 @@ function display_fooldal()
 		$posts[]=$i;
 	}
 	mysql_free_result($result);
-	$query = "SELECT id, cim, content, authorid, date_format(letrehozas, '$date_format_hir') FROM news WHERE active=1 ORDER BY letrehozas DESC LIMIT $news_limit";
+	if(is_null($id))
+		$query = "SELECT id, cim, content, fullcontent, authorid, date_format(letrehozas, '$date_format_hir') FROM news WHERE active=1 ORDER BY letrehozas DESC LIMIT $news_limit";
+	else
+		$query = "SELECT id, cim, fullcontent as content, authorid, date_format(letrehozas, '$date_format_hir') FROM news WHERE active=1 and id=$id ORDER BY letrehozas DESC LIMIT $news_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 	{
