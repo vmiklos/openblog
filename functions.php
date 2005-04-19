@@ -62,7 +62,7 @@ function display_fooldal($id=null)
 		$query = "SELECT id, cim, content, fullcontent, authorid, date_format(letrehozas, '$date_format_hir') FROM news WHERE active=1 ORDER BY letrehozas DESC LIMIT $news_limit";
 	else
 		$query = "SELECT id, cim, fullcontent as content, authorid, date_format(letrehozas, '$date_format_hir') FROM news WHERE active=1 and id=$id ORDER BY letrehozas DESC LIMIT $news_limit";
-	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$result = mysql_query($query) or die('Nincs ilyen hír!');
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 	{
 		$i['author']=name2nick($userdb[$i['authorid']]['name']);
