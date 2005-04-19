@@ -70,6 +70,10 @@ function display_fooldal($id=null)
 		$news[]=$i;
 	}
 	mysql_free_result($result);
+	if(is_null($id))
+		foreach($news as $key => $value)
+			if($value['fullcontent']!="")
+				$news[$key]['content'] .= "<p><a href=\"/news/" . $value['id'] . "\">tovább &gt;</a></p>";
 	include("templates/fooldal.php");
 }
 
