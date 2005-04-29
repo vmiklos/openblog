@@ -1,4 +1,3 @@
-- posts es hasonlo loginnevek tiltasa
 hm, nezzuk
 - engine design: post
 - helpek: prefs, post
@@ -6,6 +5,10 @@ hm, nezzuk
 - archivum
 - banner kezeles
 
+- kereses/regexp kereses
+- uj postnal ha visszamegy ne maradjon ures post
+- rss feed
+- torlesnel uploadokat is torolje
 - vmi pofasabb fooldal
 - nehany rendes sablon
 cerka bloggal kapcsolatban
