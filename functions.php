@@ -630,3 +630,5 @@ function push_user($id, $current)
 {
 	$query = "UPDATE users SET hits=" . ($current+1) . " WHERE id=" . $id;
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$pprev = "";
+	$nnext = $max - $plimit;
