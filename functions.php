@@ -285,6 +285,7 @@ function edit_post($postid)
 	if (count($_POST))
 	{
 	global $site_root;
+		'$commenturl' => "$site_root/comment/" . $comment['postid'],
 		is_numeric($_POST['postid']) or die("Nem szám: " . $_POST['postid']);
 		$query = "SELECT id, userid, title, content FROM posts WHERE id=" . $_POST['postid'];
 		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
@@ -345,6 +346,7 @@ function display_archives($usernev)
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$posts[] = $i;
 	mysql_free_result($result);
+		'$commenturl' => "$site_root/" . "comment/$postid",
 	foreach ($posts as $key => $value)
 		$posts[$key]['letrehozas'] = 
 			$value["date_format(letrehozas, \"$date_format\")"];
@@ -584,6 +586,7 @@ function handle_register($theme)
 		include("templates/reg_select.php");
 	}
 	elseif (!$valid)
+			'$commenturl' => "$site_root/comment/" . $i['id'],
 		die("Nem választható ilyen téma!");
 	else
 	{
