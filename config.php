@@ -1,5 +1,6 @@
 <?
-$mysql_host = 'localhost'; // mysql connect paramok
+// mysql connect paramok
+$mysql_host = 'localhost';
 $mysql_user = 'openblog';
 $mysql_pass = 'ballaballa';
 $mysql_db   = 'openblog';
