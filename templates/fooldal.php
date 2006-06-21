@@ -31,6 +31,17 @@ foreach($users as $i)
 <div class="box">
 <h3>Legutolsó bejegyzések ></h3>
 <ul>
+<div class="box">
+<h3>Legnépszerûbb blogok ></h3>
+
+<ul>
+<?
+foreach($toplist as $i)
+	print("\t<li><a href=\"/" . $i['name'] . "\">" . $i['displayname'] .
+		"</a> (" . $i['hits'] . ")</li>\n");
+?>
+</ul>
+</div>
 <?
 foreach($posts as $i)
 	print("\t<li><a href=\"/" . $i['name'] . "\">" . name2nick($i['name']) .

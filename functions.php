@@ -40,6 +40,11 @@ function display_fooldal($id=null)
 		$date_format_fooldalipost, $date_format_hir, $c_text;
 	
 	$query = "SELECT id, name, displayname FROM users";
+	mysql_free_result($result);
+	$query = "SELECT name, displayname, hits FROM users ORDER BY hits DESC LIMIT $users_limit";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$toplist[]=$i;
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$userdb[$i['id']]=$i;
