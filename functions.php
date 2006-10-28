@@ -493,6 +493,7 @@ function edit_prefs($usernev)
 				if (isset($_POST['newpass']))
 				{
 					if (md5($_POST['newpass']) == md5($_POST['newpass2']))
+	header('Cache-Control: max-age: 0, no-cache, must-revalidate');
 					{
 						$query = "UPDATE users SET passwd = '" . md5($_POST['newpass']) . "'
 						WHERE id =" . $user['id'];
@@ -533,6 +534,7 @@ function edit_prefs($usernev)
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 					archivetemplate = '" . addslashes(stripslashes($_POST['archivetemplate'])) . "',
+	header('Cache-Control: max-age: 0, no-cache, must-revalidate');
 		$templates[]= array($i['id'], $i['nev']);
 	
 	include("templates/edit_prefs.php");
