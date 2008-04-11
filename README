@@ -1,0 +1,47 @@
+= Open blog engine, written in PHP
+Miklos Vajna <vmiklos@vmiklos.hu>
+
+== What's openblog?
+
+openblog is a simple blog engine, written in PHP. I was hired to write a
+blog engine and the requirements were fairly easy, I wanted to make sure
+I can write such a software, so I wrote it.
+
+It has the following benefits:
+
+- requires only PHP and MySQL
+
+- it's small, so if you want to customize it, you can do it easily,
+  since understanding the whole source code is not a problem
+
+- it has an integrated rich text editor, clean URLs, RSS, so everything
+  what is needed in a general blog.
+
+== Status
+
+Maintaining software is always a pain and given that I'm no longer paid
+for doing so, I recently switched to
+http://b2evolution.net/[b2evolution].
+
+== Download
+
+----
+darcs get --partial http://vmiklos.hu/project/openblog
+----
+
+should be able to download the code.
+
+== How does it work?
+
+I think all you have to modify is renaming `htaccess.sample` to
+`.htaccess` and finetuning `config.php`, especially the MySQL password
+part.
+
+== Samples
+
+A sample installation of openblog is available
+http://openblog.vmiklos.hu/[here].
+
+Back to my link:/projects[projects page].
+
+// vim: ft=asciidoc
