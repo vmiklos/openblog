@@ -1,0 +1,3 @@
+AddType text/plain .php
+DirectoryIndex index.html
+Options +Indexes

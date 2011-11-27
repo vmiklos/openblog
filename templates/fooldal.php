@@ -8,17 +8,20 @@
 <body>
 <div id="page-wrapper">
 <div id="page-head">
+<? print_ad(); ?>
 </div>
 <div id="left-wrapper">
 <div id="left">
 <div class="box">
-<h3>Új felhasználók ></h3>
-<h3>Regisztráció ></h3>
+<h3>Menü ></h3>
 <ul>
+<li><a href="/">Kezdõlap</a></li>
 <li><a href="/register">Szeretnék saját blogot</a></li>
+<li><a href="/list">Bloggerek listája</a></li>
 </ul>
 </div>
 <div class="box">
+<h3>Új felhasználók ></h3>
 
 <ul>
 <?
@@ -28,9 +31,6 @@ foreach($users as $i)
 ?>
 </ul>
 </div>
-<div class="box">
-<h3>Legutolsó bejegyzések ></h3>
-<ul>
 <div class="box">
 <h3>Legnépszerûbb blogok ></h3>
 
@@ -42,16 +42,18 @@ foreach($toplist as $i)
 ?>
 </ul>
 </div>
+<div class="box">
+<h3>Legutolsó bejegyzések ></h3>
+<ul>
 <?
 foreach($posts as $i)
-	print("\t<li><a href=\"/" . $i['name'] . "\">" . name2nick($i['name']) .
+	print("\t<li><a href=\"/posts/" . $i['id'] . "\">" . name2nick($i['name']) .
 		"</a> (" . $i['letrehozas'] . ")</li>\n");
 ?>
 </ul>
 </div>
 </div>
 </div>
-
 <div id="content">
 <?
 foreach($news as $i)
@@ -64,9 +66,10 @@ foreach($news as $i)
 }
 ?>
 </div>
-
+<div id="clear"></div>
+<div id="secfooter"></div>
 <div id="footer">
-<? print($c_text); ?>
+<span><? print($c_text); ?></span>
 </div>
 
 </div>

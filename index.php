@@ -3,33 +3,19 @@ include("config.php");
 include("functions.php");
 require_once("connection.php");
 
-$command = substr($_SERVER["PATH_INFO"], 1);
+/* a kapott url vmi openblog.hu/foo/bar lesz
+ * foot benyomjuk $handle-be, bart meg $paramba */
+$handle = substr($_SERVER["PATH_INFO"], 1);
 if (strpos($_SERVER["PATH_INFO"], "/") !== false)
-	$command = preg_replace('|^([^/]*)/.*|', '$1', $command);
+	$handle = preg_replace('|^([^/]*)/.*|', '$1', $handle);
 
-$param = preg_replace('|^[^/]*/([^/]*)|', '$1', substr($_SERVER["PATH_INFO"], 1));
+$param = preg_replace('|^[^/]*/([^/]*)|', '$1',
+	substr($_SERVER["PATH_INFO"], 1));
 
-if ($command == "")
-	display_fooldal();
-elseif($command == "new")
-	create_post($param);
-elseif($command == "news")
-	display_fooldal($param);
-elseif($command == "posts")
-	display_post($param);
-elseif($command == "delete")
-	delete_post($param);
-elseif($command == "upload")
-	handle_upload($param);
-elseif($command == "adclick")
-	click_ad($param);
-elseif($command == "prefs")
-	edit_prefs($param);
-elseif($command == "register")
-	handle_register($param);
-elseif($command == "archives")
-	display_archives($param);
+if ($handle == "")
+	handle_news();
+elseif(in_array($handle, $handlers))
+	call_user_func("handle_$handle", $param);
 else
-	display_user($command);
-
+	handle_user($handle, $param);
 ?>

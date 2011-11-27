@@ -34,27 +34,27 @@ if (!function_exists('file_put_contents'))
 	}
 }
 
-function display_fooldal($id=null)
+function handle_news($id=null)
 {
 	global $site_root, $users_limit, $posts_limit, $news_limit,
 		$date_format_fooldalipost, $date_format_hir, $c_text;
 	
 	$query = "SELECT id, name, displayname FROM users";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$userdb[$i['id']]=$i;
 	mysql_free_result($result);
 	$query = "SELECT name, displayname, hits FROM users ORDER BY hits DESC LIMIT $users_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$toplist[]=$i;
-	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
-		$userdb[$i['id']]=$i;
 	mysql_free_result($result);
 	$query = "SELECT id, name, displayname, blogtitle, email, registration_date FROM users ORDER BY registration_date DESC LIMIT $users_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$users[]=$i;
 	mysql_free_result($result);
-	$query = "SELECT id, userid, title, date_format(letrehozas, '$date_format_fooldalipost') FROM posts ORDER BY letrehozas DESC LIMIT $posts_limit";
+	$query = "SELECT id, userid, title, date_format(letrehozas, '$date_format_fooldalipost') FROM posts WHERE content != '' ORDER BY letrehozas DESC LIMIT $posts_limit";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 	{
@@ -88,7 +88,7 @@ function name2nick($input)
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
-	if (is_null($user['displayname']))
+	if ($user['displayname']=="")
 		return $input;
 	else
 		return $user['displayname'];
@@ -110,12 +110,12 @@ function nick2name($input)
 
 function get_template($id, $type)
 {
-	$query = "SELECT content  FROM templates WHERE id='$id'";
+	$query = "SELECT template from users WHERE id='$id'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-	$template = mysql_fetch_array($result, MYSQL_ASSOC);
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
 	
-	$less = explode("<post>", $template['content']);
+	$less = explode("<post>", $user['template']);
 	if ($type == "header")
 		return $less[0];
 	else
@@ -128,16 +128,24 @@ function get_template($id, $type)
 	}
 }
 
-function display_user($name)
+function handle_user($name, $param)
 {
 	global $site_root, $c_text;
-	$query = "SELECT id, email, displayname, blogtitle, `limit` FROM users WHERE name='$name'";
+	if($param != null and $name != $param)
+		print("<!-- search -->\n");
+	else
+		print("<!-- normal -->\n");
+	$query = "SELECT id, email, displayname, blogtitle, `limit`, hits FROM users WHERE name='$name'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
 	$nick=name2nick($name);
 
-	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "' ORDER BY letrehozas DESC LIMIT " . $user['limit'];
+	if($param != null and $name != $param)
+		$squery="and content like '%$param%' ";
+	else
+		$lquery="LIMIT " . $user['limit'];
+	$query = "SELECT id  FROM posts WHERE userid='" . $user['id'] . "' and content != '' $squery ORDER BY letrehozas DESC " . $lquery;
 	$result = mysql_query($query) or die("Ismeretlen felhasználó: $name");
 	push_user($user['id'], $user['hits']);
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
@@ -149,21 +157,64 @@ function display_user($name)
 		'$fooldal' => "$site_root/$name",
 		'$archiveurl' => "$site_root/archives/$name",
 		'$newurl' => "$site_root/new/$name",
+		'$prefsurl' => "$site_root/prefs/$name",
 		'$nev' => $nick,
 		'$usernev' => $name,
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
+		'$postszam' => count_posts($user['id']),
 		'$szamlalo' => $user['hits'],
 		'$copyright' => $c_text
 	);
 	
-	print(strtr(get_template($user['templateid'], "header"), $csere));
-	foreach($posts as $i)
-		display_post($i, true);
-	print(strtr(get_template($user['templateid'], "footer"), $csere));
+	print(strtr(get_template($user['id'], "header"), $csere));
+	if(count($posts)>0)
+		foreach($posts as $i)
+			handle_posts($i, true);
+	print(strtr(get_template($user['id'], "footer"), $csere));
 }
 
-function delete_post($postid)
+function handle_delcomment($commentid)
+{
+	global $site_root;
+	is_numeric($commentid) or die("Nem szám: $commentid");
+	$query = "SELECT postid FROM comments WHERE id=$commentid";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$comment = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	$query = "SELECT userid FROM posts WHERE id=" . $comment['postid'];
+	$result = mysql_query($query) or die("Nincs is ilyen hozzászólás!");
+	$post = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	$query = "SELECT name, passwd FROM users where id=" . $post['userid'];
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	if( !isset($_SERVER['PHP_AUTH_USER']) )
+	{
+		header("WWW-Authenticate: Basic realm=\"OpenBlog.hu\"");
+		header('HTTP/1.0 401 Unauthorized');
+		die("A törléshez jelszó megadása szükséges!");
+	}
+	else
+	{
+		if ($user['name']==$_SERVER['PHP_AUTH_USER'] and 
+			md5($_SERVER['PHP_AUTH_PW'])==$user['passwd'])
+		{
+			$query = "DELETE FROM comments WHERE id=" . $commentid;
+			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+			header("Location: $site_root/posts/" . $comment['postid']);
+		}
+		else
+		{
+			$realm = mt_rand( 1, 1000000000 );
+			header( 'WWW-Authenticate: Basic realm='.$realm );
+			die("Nem megfelelõ felhasználónév vagy jelszó!");
+		}
+	}
+}
+
+function handle_delete($postid)
 {
 	global $site_root;
 	is_numeric($postid) or die("Nem szám: $postid");
@@ -177,7 +228,7 @@ function delete_post($postid)
 	mysql_free_result($result);
 	if( !isset($_SERVER['PHP_AUTH_USER']) )
 	{
-		header("WWW-Authenticate: Basic realm=\"Bejegyzés törlése\"");
+		header("WWW-Authenticate: Basic realm=\"OpenBlog.hu\"");
 		header('HTTP/1.0 401 Unauthorized');
 		die("A törléshez jelszó megadása szükséges!");
 	}
@@ -188,7 +239,7 @@ function delete_post($postid)
 		{
 			$query = "DELETE FROM posts WHERE id=" . $postid;
 			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-			header("Location: $site_root/index.php/" . $user['name']);
+			header("Location: $site_root/" . $user['name']);
 		}
 		else
 		{
@@ -201,15 +252,92 @@ function delete_post($postid)
 
 // ha pure true, akkor nincs header meg footer
 
-function display_post($postid, $pure=false)
+function handle_comments($commentid, $pure=false)
 {
-	global $site_root;
+	global $site_root, $c_text;
+	is_numeric($commentid) or die("Nem szám: $commentid");
+	$query = "SELECT postid, name, contact, title, content, letrehozas FROM comments WHERE id=$commentid";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$comment = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+
+	// felado hozzaadasa a comment tartalmahoz
+	if (preg_match("|^http://|", $comment['contact']))
+		$href="<a href=\"" . $comment['contact'] . "\">";
+	elseif (preg_match("/.+@.+\..+/", $comment['contact']))
+		$href="<a href=\"mailto:" . $comment['contact'] . "\">";
+	else
+		$href="<a href=\"http://" . $comment['contact'] . "\">";
+	
+	// TODO: ez igy nem tul szep, esetleg lehetne majd finomitani
+	$comment['content']="<div>Feladó: $href" . $comment['name'] . "</a>" .
+		"</div><div>" . $comment['content'] . "</div>";
+	
+	$query = "SELECT userid FROM posts WHERE id=" . $comment['postid'];
+	$result = mysql_query($query) or die("Nincs ilyen hozzászólás!");
+	$post = mysql_fetch_array($result, MYSQL_ASSOC);
+	$query = "SELECT id, name, email, displayname, date_format, blogtitle, hits FROM users WHERE id=" . $post['userid'];
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	if ($pure==false)
+		push_user($user['id'], $user['hits']);
+	$query = "SELECT date_format(letrehozas, '" . $user['date_format'] . "') FROM comments WHERE id=$commentid";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$post2=mysql_fetch_array($result, MYSQL_ASSOC);
+	$post['letrehozas']=$post2["date_format(letrehozas, '" . $user['date_format'] . "')"];
+	mysql_free_result($result);
+	if (!is_null($user['displayname']))
+		$comment['user']=$user['displayname'];
+	else
+		$comment['user']=$user['name'];
+	
+	// a $cuccok lecserelese, itt vannak comment-specifikus cuccok is
+	$csere = array(
+		'$fooldal' => "$site_root/posts/" . $comment['postid'],
+		'$archiveurl' => "$site_root/archives/" . $user['name'],
+		'$newurl' => "$site_root/new/" . $user['name'],
+		'$prefsurl' => "$site_root/prefs/" . $user['name'],
+		'$nev' => $comment['user'],
+		'$usernev' => $user['name'],
+		'$blogcim' => $user['blogtitle'],
+		'$email' => $user['email'],
+		'$postszam' => count_posts($user['id']),
+		'$szamlalo' => $user['hits'],
+		'$deleteurl' => "$site_root/" . "delcomment/$commentid",
+		'$commenturl' => "$site_root/comment/" . $comment['postid'],
+		'$editurl' => "$site_root/" . "editcomment/$commentid",
+		'$posturl' => "$site_root/" . "comments/$commentid",
+		'$ido' => $comment['letrehozas'],
+		'$postcim' => $comment['title'],
+		'$post' => $comment['content'],
+		'$copyright' => $c_text
+	);
+	
+	if (!$pure)
+		print(strtr(get_template($user['id'], "header"), $csere));
+	print(preg_replace('| \(\$commentnum.*\)|', '', strtr(get_template($user['id'], "post"), $csere)));
+	if (!$pure)
+		print(strtr(get_template($user['id'], "footer"), $csere));
+}
+
+// fake fuggveny mivel eleg gazos lenne ha csakugy atirhatnank masok velemenyet
+function handle_editcomment($commentid)
+{
+	die("A hozzászólások nem szerkeszthetõek. A bejegyzések tulajdonosai <a href=\"/delcomment/$commentid\">törölhetik</a> a hozzászólásokat.");
+}
+
+// ha pure true, akkor nincs header meg footer
+
+function handle_posts($postid, $pure=false)
+{
+	global $site_root, $c_text;
 	is_numeric($postid) or die("Nem szám: $postid");
-	$query = "SELECT userid, content, title, date_format(letrehozas, '$date_format') FROM posts WHERE id=$postid";
+	$query = "SELECT userid, content, title FROM posts WHERE id=$postid";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$post = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
-	$query = "SELECT id, name, email, displayname, date_format, blogtitle FROM users WHERE id=" . $post['userid'];
+	$query = "SELECT id, name, email, displayname, date_format, blogtitle, hits FROM users WHERE id=" . $post['userid'];
 	// $result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$result = mysql_query($query) or die("Nincs ilyen post!");
 	$user = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -225,28 +353,54 @@ function display_post($postid, $pure=false)
 		$post['user']=$user['displayname'];
 	else
 		$post['user']=$user['name'];
+	$commentids = get_commentids($postid);
 	
 	// a $cuccok lecserelese, itt vannak post-specifikus cuccok is
 	$csere = array(
 		'$fooldal' => "$site_root/" . $user['name'],
 		'$archiveurl' => "$site_root/archives/" . $user['name'],
 		'$newurl' => "$site_root/new/" . $user['name'],
-		'$nev' => $name,
+		'$prefsurl' => "$site_root/prefs/" . $user['name'],
+		'$nev' => $post['user'],
 		'$usernev' => $user['name'],
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
+		'$postszam' => count_posts($user['id']),
 		'$szamlalo' => $user['hits'],
-		'$posturl' => $_SERVER["SCRIPT_NAME"] . "/posts/$postid",
-		'$deleteurl' => $_SERVER["SCRIPT_NAME"] . "/delete/$postid",
+		'$deleteurl' => "$site_root/" . "delete/$postid",
+		'$commenturl' => "$site_root/" . "comment/$postid",
+		'$commentnum' => count($commentids),
+		'$editurl' => "$site_root/" . "edit/$postid",
+		'$posturl' => "$site_root/" . "posts/$postid",
 		'$ido' => $post['letrehozas'],
-		'$post' => $post['content']
+		'$postcim' => $post['title'],
+		'$post' => $post['content'],
+		'$copyright' => $c_text
 	);
 	
 	if (!$pure)
-		print(strtr(get_template($user['templateid'], "header"), $csere));
-	print(strtr(get_template($user['templateid'], "post"), $csere));
+		print(strtr(get_template($user['id'], "header"), $csere));
+	print(strtr(get_template($user['id'], "post"), $csere));
 	if (!$pure)
-		print(strtr(get_template($user['templateid'], "footer"), $csere));
+	{
+		if (is_array($commentids))
+			foreach($commentids as $i)
+				handle_comments($i, true);
+		print(strtr(get_template($user['id'], "footer"), $csere));
+	}
+}
+
+function get_commentids($postid)
+{
+	$query = "SELECT id FROM comments WHERE postid=$postid";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$comments[] = $i;
+	mysql_free_result($result);
+	if (is_array($comments))
+		foreach($comments as $i)
+			$ids[]=$i['id'];
+	return($ids);
 }
 
 function handle_upload($input)
@@ -268,13 +422,14 @@ function handle_upload($input)
 
 function display_upload_form()
 {
-	global $upload_dir;
+	global $upload_dir, $site_root;
 	if (!count($_FILES))
 		include("templates/upload_form.php");
 	else
 	{
 		$query="INSERT INTO uploads (name, type, ownerid, data) VALUES('" . $_FILES['feltoltes']['name'] . "', '" . $_FILES['feltoltes']['type'] . "', '1', '" . addslashes(file_get_contents($_FILES['feltoltes']['tmp_name'])) . "');";
 		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		$id=mysql_insert_id();
 		if(!@unlink($_FILES['feltoltes']['tmp_name']))
 		{
 			$query="delete from uploads where id=" . mysql_insert_id();
@@ -285,12 +440,11 @@ function display_upload_form()
 	}
 }
 
-function edit_post($postid)
+function handle_edit($postid)
 {
+	global $site_root, $c_text;
 	if (count($_POST))
 	{
-	global $site_root;
-		'$commenturl' => "$site_root/comment/" . $comment['postid'],
 		is_numeric($_POST['postid']) or die("Nem szám: " . $_POST['postid']);
 		$query = "SELECT id, userid, title, content FROM posts WHERE id=" . $_POST['postid'];
 		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
@@ -300,43 +454,133 @@ function edit_post($postid)
 		$result = mysql_query($query) or die("Nincs is ilyen bejegyzés!");
 		$user = mysql_fetch_array($result, MYSQL_ASSOC);
 		mysql_free_result($result);
-			if( !isset($_SERVER['PHP_AUTH_USER']) )
+		if( !isset($_SERVER['PHP_AUTH_USER']) )
+		{
+			header("WWW-Authenticate: Basic realm=\"OpenBlog.hu\"");
+			header('HTTP/1.0 401 Unauthorized');
+			die("A szerkesztéshez jelszó megadása szükséges!");
+		}
+		else
+		{
+			if ($user['name']==$_SERVER['PHP_AUTH_USER'] and 
+				md5($_SERVER['PHP_AUTH_PW'])==$user['passwd'])
 			{
-				header("WWW-Authenticate: Basic realm=\"Bejegyzés szerkesztése\"");
-				header('HTTP/1.0 401 Unauthorized');
-				die("A szerkesztéshez jelszó megadása szükséges!");
+				if($_POST['title'] == "")
+					$_POST['title']="null";
+				else
+					$_POST['title']="'" . addslashes(stripslashes($_POST['title'])). "'";
+				$query = "UPDATE posts SET content = '" . addslashes(stripslashes(urldecode(str_replace("\r", " ", str_replace("\n", " ", str_replace("\r\n", " ", $_POST['rte1'])))))) . "', title = " . $_POST['title'] . " WHERE id =" . $_POST['postid'];
+				$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+				header("Location: $site_root/" . $user['name']);
 			}
 			else
-			{
-				if ($user['name']==$_SERVER['PHP_AUTH_USER'] and 
-					md5($_SERVER['PHP_AUTH_PW'])==$user['passwd'])
-				{
-					$query = "UPDATE posts SET content = '" . addslashes(stripslashes($_POST['content'])) . "' " .	"WHERE id =" . $_POST['postid'];
-					$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-					print("Betettem!");
-				}
-			else
-				die("Nem megfelelõ felhasználónév vagy jelszó!");
-		}
-	}
 			{
 				$realm = mt_rand( 1, 1000000000 );
 				header( 'WWW-Authenticate: Basic realm='.$realm );
-	else
+				die("Nem megfelelõ felhasználónév vagy jelszó!");
 			}
+		}
+	}
+	else
 	{
 		is_numeric($postid) or die("Nem szám: $postid");
 		$query = "SELECT id, userid, title, content FROM posts WHERE id=$postid";
 		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 		$post = mysql_fetch_array($result, MYSQL_ASSOC);
+		$post['title']=htmlspecialchars($post['title']);
+		$post['content']=addslashes($post['content']);
 		mysql_free_result($result);
 		include("templates/edit_form.php");
 	}
 }
 
-?>
+function handle_xmlpost($id)
+{
+	$query = "SELECT id, title, content, UNIX_TIMESTAMP(letrehozas) from posts where id = $id";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$post = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
 
-function display_archives($usernev)
+	if ($post['id']==null)
+		die("Nincs ilyen post: $id");
+	header('Content-Type: application/xml; charset=iso-8859-2');
+	header('Cache-Control: max-age: 0, no-cache, must-revalidate');
+	print("<?xml version=\"1.0\" encoding=\"iso-8859-2\" ?>
+<!DOCTYPE openblogpost [
+        <!ELEMENT title (#PCDATA)>
+        <!ELEMENT text (#PCDATA)>
+        <!ELEMENT comment (#PCDATA)>
+        <!ATTLIST comment
+                commentid CDATA #REQUIRED>
+]>
+<openblogpost>
+<title>");
+if ($post['title'] != "")
+	print($post['title']);
+else
+	print(htmlspecialchars(first_words($post['content'])));
+print("</title>
+	<text>" . htmlspecialchars($post['content']) . "</text>\n");
+print("<date>" . $post['UNIX_TIMESTAMP(letrehozas)'] . "</date>");
+	$query = "select id, name, content, contact, UNIX_TIMESTAMP(letrehozas) from comments where postid = $id";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+	{
+		$email = $url = "";
+		if(strpos($i['contact'], '@') !== false)
+			$email = $i['contact'];
+		else
+			$url = $i['contact'];
+		$date = $i['UNIX_TIMESTAMP(letrehozas)'];
+		print("\t<comment id=\"" . $i['id'] . "\" author=\"" . $i['name'] . "\" email=\"$email\" url=\"$url\" date=\"$date\">" . htmlspecialchars($i['content']) . "</comment>\n");
+	}
+print("</openblogpost>\n");
+}
+
+function handle_xmlposts($usernev)
+{
+	$query = "SELECT * FROM users WHERE name='$usernev'";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+
+	if ($user['id']==null)
+		die("Nincs ilyen felhaszáló: $usernev");
+	$query = "SELECT id, title, content, unix_timestamp(letrehozas) FROM posts WHERE userid=" . $user['id'] . " and content != '' ORDER BY unix_timestamp(letrehozas) DESC";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+	{
+		$query="SELECT count(id) FROM `comments` WHERE postid=" . $i['id'];
+		$result2 = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		$cnum = mysql_fetch_array($result2, MYSQL_ASSOC);
+		mysql_free_result($result2);
+		$i['comments'] = $cnum['count(id)'];
+		$posts[] = $i;
+	}
+	mysql_free_result($result);
+	header('Content-Type: application/xml; charset=iso-8859-2');
+	header('Cache-Control: max-age: 0, no-cache, must-revalidate');
+	print("<?xml version=\"1.0\" encoding=\"iso-8859-2\" ?>
+<!DOCTYPE openblogposts [
+        <!ELEMENT post (title)>
+        <!ATTLIST post
+                postid CDATA #REQUIRED
+                pubdate CDATA #REQUIRED
+                comments CDATA #REQUIRED>
+        <!ELEMENT title (#PCDATA)>
+]>
+<openblogposts>\n");
+	if($posts)
+		foreach($posts as $i)
+		{
+			print("<post postid=\"" . $i['id'] . "\" pubdate=\"" . date(DATE_RFC2822, $i['unix_timestamp(letrehozas)']) . "\" comments=\"".$i['comments']."\">\n");
+			print("\t<title>".$i['title']."</title>\n");
+			print("</post>\n");
+		}
+	print("</openblogposts>\n");
+}
+
+function handle_archives($usernev)
 {
 	global $date_format, $site_root, $c_text;
 	$query = "SELECT * FROM users WHERE name='$usernev'";
@@ -346,19 +590,20 @@ function display_archives($usernev)
 	
 	if ($user['id']==null)
 		die("Nincs ilyen felhaszáló: $usernev");
-	$query = "SELECT id, title, content, date_format(letrehozas, \"$date_format\") FROM posts WHERE userid=" . $user['id'];
+	$query = "SELECT id, title, content, date_format(letrehozas, \"$date_format\") FROM posts WHERE userid=" . $user['id'] . " and content != '' ORDER BY letrehozas DESC";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$posts[] = $i;
 	mysql_free_result($result);
-		'$commenturl' => "$site_root/" . "comment/$postid",
-	foreach ($posts as $key => $value)
-		$posts[$key]['letrehozas'] = 
-			$value["date_format(letrehozas, \"$date_format\")"];
+	if($posts)
+		foreach ($posts as $key => $value)
+			$posts[$key]['letrehozas'] =
+				$value["date_format(letrehozas, \"$date_format\")"];
 	$honapok = array();
-	foreach($posts as $i)
-		if (!in_array($i['letrehozas'], $honapok))
-			$honapok[]=$i['letrehozas'];
+	if($posts)
+		foreach($posts as $i)
+			if (!in_array($i['letrehozas'], $honapok))
+				$honapok[]=$i['letrehozas'];
 			
 	// a $cuccok lecserelese
 	$csere = array(
@@ -370,8 +615,9 @@ function display_archives($usernev)
 		'$usernev' => $user['name'],
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
-		'$copyright' => $c_text
+		'$postszam' => count_posts($user['id']),
 		'$szamlalo' => $user['hits'],
+		'$copyright' => $c_text
 	);
 	
 	print(strtr(get_archivetemplate($user['id'], "header"), $csere));
@@ -380,57 +626,97 @@ function display_archives($usernev)
 	print(strtr(get_archivetemplate($user['id'], "footer"), $csere));
 }
 
-function first_words($input)
+function first_words($input, $idezet=false)
 {
-	global $postcim_lenght;
+	$input = preg_replace("/\. .*/", '', $input);
+	if ($idezet)
+	{
+		global $postidezet_lenght;
+		$lenght=$postidezet_lenght;
+	}
+	else
+	{
+		global $postcim_lenght;
+		$lenght=$postcim_lenght;
+	}
 	$words = explode(' ', strip_tags($input));
-	$words = array_slice($words, 0, $postcim_lenght);
-	return(implode(' ', $words) . "...");
+	$words = array_slice($words, 0, $lenght);
+	return(implode(' ', $words));
 }
 
 function display_archivemonth($user, $honap)
 {
 	global $date_format, $site_root, $date_format_display;
 	$userid=$user['id'];
-	$query="SELECT * FROM posts WHERE date_format(letrehozas, \"$date_format\" ) = \"$honap\" AND userid =$userid";
+	$query="SELECT id, userid, content, title, date_format(letrehozas, '" . $user['date_format'] . "') FROM posts WHERE date_format(letrehozas, \"$date_format\" ) = \"$honap\" AND userid=$userid and content != '' ORDER BY letrehozas DESC";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+	{
+		$i['letrehozas']=$i["date_format(letrehozas, '" . $user['date_format'] . "')"];
 		$posts[] = $i;
+	}
 	mysql_free_result($result);
-	
-	// a $cuccok lecserelese
-	$csere = array(
-	
+
+	if($posts[0]==null)
+		return;
 	$query = "SELECT UNIX_TIMESTAMP(letrehozas) FROM posts WHERE id=" . $posts[0]['id'];
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$honap = mysql_fetch_array($result, MYSQL_ASSOC);
 	mysql_free_result($result);
 	$honap = strftime($date_format_display, $honap['UNIX_TIMESTAMP(letrehozas)']);
+	
+	// a $cuccok lecserelese
+	$csere = array(
 		'$fooldal' => "$site_root/" . $user['name'],
+		'$archiveurl' => "$site_root/archives/" . $user['name'],
 		'$newurl' => "$site_root/new/" . $user['name'],
 		'$prefsurl' => "$site_root/prefs/" . $user['name'],
 		'$nev' => name2nick($user['name']),
-		'$archiveurl' => "$site_root/archives/" . $user['name'],
 		'$usernev' => $user['name'],
 		'$blogcim' => $user['blogtitle'],
 		'$email' => $user['email'],
+		'$postszam' => count_posts($user['id']),
+		'$szamlalo' => $user['hits'],
 		'$honap' => $honap
 	);
 	
 	print(strtr(get_archivetemplate($userid, "monthheader"), $csere));
 	foreach($posts as $i)
-		print(get_archivetemplate($userid, "post"));
+	{
+		if(is_null($i['title']))
+			$i['title']=first_words($i['content']);
+		$i['idezet']=first_words($i['content'], true);
+		
+		// a $cuccok lecserelese, itt vannak post-specifikus cuccok is
+		$csere2 = array(
+			'$fooldal' => "$site_root/" . $user['name'],
+			'$archiveurl' => "$site_root/archives/" . $user['name'],
+			'$newurl' => "$site_root/new/" . $user['name'],
+			'$prefsurl' => "$site_root/prefs/" . $user['name'],
+			'$nev' => name2nick($user['name']),
+			'$usernev' => $user['name'],
+			'$blogcim' => $user['blogtitle'],
+			'$email' => $user['email'],
+			'$postszam' => count_posts($user['id']),
+			'$szamlalo' => $user['hits'],
+			'$deleteurl' => "$site_root/delete/" . $i['id'],
+			'$commenturl' => "$site_root/comment/" . $i['id'],
+			'$editurl' => "$site_root/edit/" . $i['id'],
+			'$posturl' => "$site_root/posts/" . $i['id'],
+			'$ido' => $i['letrehozas'],
+			'$postcim' => $i['title'],
+			'$postidezet' => $i['idezet'],
+			'$post' => $i['content'],
+			'$honap' => $honap
+		);
+		print(strtr(get_archivetemplate($userid, "post"), $csere2));
+	}
 	print(strtr(get_archivetemplate($userid, "monthfooter"), $csere));
 }
 
-		if(is_null($i['title']))
-			$i['title']=first_words($i['content']);
-		
 // header, monthheader, post, monthfooter v footer lehet. default: post
-		'$szamlalo' => $user['hits'],
 
 function get_archivetemplate($id, $type)
-			'$archiveurl' => "$site_root/archives/" . $user['name'],
 {
 	$query = "SELECT archivetemplate from users WHERE id='$id'";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
@@ -448,7 +734,6 @@ function get_archivetemplate($id, $type)
 		$eless = explode("<post>", $less[1]);
 		return $eless[0];
 		break;
-			'$szamlalo' => $user['hits'],
 	case "post":
 		$less = explode("<post>", $user['archivetemplate']);
 		$eless = explode("</post>", $less[1]);
@@ -466,9 +751,9 @@ function get_archivetemplate($id, $type)
 	}
 }
 
-function edit_prefs($usernev)
+function handle_prefs($usernev)
 {
-	global $site_root;
+	global $site_root, $c_text;
 	
 	if (count($_POST))
 	{
@@ -481,9 +766,9 @@ function edit_prefs($usernev)
 		// jelszobekeres
 		if( !isset($_SERVER['PHP_AUTH_USER']) )
 		{
-			header("WWW-Authenticate: Basic realm=\"Bejegyzés létrehozása\"");
+			header("WWW-Authenticate: Basic realm=\"OpenBlog.hu\"");
 			header('HTTP/1.0 401 Unauthorized');
-			die("A létrehozáshoz jelszó megadása szükséges!");
+			die("A beállítások módosításához jelszó megadása szükséges!");
 		}
 		else
 		{
@@ -493,7 +778,6 @@ function edit_prefs($usernev)
 				if (isset($_POST['newpass']))
 				{
 					if (md5($_POST['newpass']) == md5($_POST['newpass2']))
-	header('Cache-Control: max-age: 0, no-cache, must-revalidate');
 					{
 						$query = "UPDATE users SET passwd = '" . md5($_POST['newpass']) . "'
 						WHERE id =" . $user['id'];
@@ -511,15 +795,21 @@ function edit_prefs($usernev)
 					email = '" . addslashes(stripslashes($_POST['email'])) . "',
 					templatetitle = '" . addslashes(stripslashes($_POST['templatetitle'])) . "',
 					template = '" . addslashes(stripslashes($_POST['template'])) . "',
+					archivetemplate = '" . addslashes(stripslashes($_POST['archivetemplate'])) . "',
 					date_format = '" . addslashes(stripslashes($_POST['date_format'])) . "',
-					`limit` ='" . addslashes(stripslashes($_POST['limit'])) . "'
+					`limit` ='" . addslashes(stripslashes($_POST['limit'])) . "',
+					want_antispam =" . (int)($_POST['want_antispam'] == "on") . "
 					WHERE id =" . $user['id'];
 					$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 					header("Location: $site_root/" . $user['name']);
 				}
 			}
 			else
+			{
+				$realm = mt_rand( 1, 1000000000 );
+				header( 'WWW-Authenticate: Basic realm='.$realm );
 				die("Nem megfelelõ felhasználónév vagy jelszó!");
+			}
 		}
 	}
 	$query = "SELECT * FROM users WHERE name='$usernev'";
@@ -529,18 +819,199 @@ function edit_prefs($usernev)
 	
 	if ($user['id']==null)
 		die("Nincs ilyen felhaszáló: $usernev");
-
-	$query = "SELECT id, nev FROM templates";
-	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
-					archivetemplate = '" . addslashes(stripslashes($_POST['archivetemplate'])) . "',
-	header('Cache-Control: max-age: 0, no-cache, must-revalidate');
-		$templates[]= array($i['id'], $i['nev']);
-	
 	include("templates/edit_prefs.php");
 }
 
-function create_post($usernev)
+function handle_rss($usernev)
+{
+	global $site_root, $site_name;
+	
+	$query = "SELECT * FROM users WHERE name='$usernev'";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	if ($user['id']==null)
+		die("Nincs ilyen felhaszáló: $usernev");
+	$query = "SELECT * FROM posts WHERE userid='" . $user['id'] . "' and content != '' ORDER BY letrehozas DESC LIMIT " . $user['limit'];
+	$result = mysql_query($query) or die("Hiba a lekérdezésben: $name");
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$posts[] = $i;
+	$rss = array();
+	$csere=array(
+		'&' => "&amp;",
+		'<' => "&lt;",
+		'>' => "&gt;",
+		'\'' => "&apos;",
+		'"' => "&quot;"
+		);
+	foreach ($posts as $i)
+	{
+		if(is_null($i['title']))
+			$i['title']=first_words($i['content']);
+		$rss[] = array(strtr($i['title'], $csere),
+			strtr($i['content'], $csere),
+			$site_name . "/posts/" . $i['id']);
+	}
+	mysql_free_result($result);
+	header('Content-Type: application/xml; charset=iso-8859-2');
+	print('<?xml version="1.0"  encoding="iso-8859-2"?>
+<rss version="2.0">
+<channel>');
+print("<title>" . $user['blogtitle'] . "</title>");
+print("<description>" . $user['blogtitle'] . " - az utolsó " . $user['limit'] . " bejegyzés</description>");
+print("<link>$site_name/" . $user['name'] . "</link>");
+foreach ($rss as $i)
+	print("<item>\n<title>" . $i[0] . "</title>\n" .
+		"<description>" . $i[1] . "</description>\n" .
+		"<link>" . $i[2] . "</link>\n</item>");
+print("</channel>\n</rss>");
+}
+
+function handle_postrss($id)
+{
+	global $site_root, $site_name;
+	
+	$query = "SELECT * FROM posts WHERE id=$id";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$post = mysql_fetch_array($result, MYSQL_ASSOC);
+	if ($post['id']==null)
+		die("Nincs ilyen post!");
+	$query = "SELECT blogtitle, name, `limit` FROM users WHERE id=" . $post['userid'];
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	$query = "SELECT * FROM comments WHERE postid='" . $post['id'] . "' ORDER BY letrehozas DESC LIMIT " . $user['limit'];
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$comments[] = $i;
+	$rss = array();
+	$csere=array(
+		'&' => "&amp;",
+		'<' => "&lt;",
+		'>' => "&gt;",
+		'\'' => "&apos;",
+		'"' => "&quot;"
+		);
+	foreach ($comments as $i)
+	{
+		if($i['title'] == "")
+			$i['title']=first_words($i['content']);
+		$rss[] = array(strtr($i['title'], $csere),
+			strtr($i['content'], $csere),
+			$site_name . "/posts/" . $i['postid']);
+	}
+	mysql_free_result($result);
+	header('Content-Type: application/xml; charset=iso-8859-2');
+	print('<?xml version="1.0"  encoding="iso-8859-2"?>
+<rss version="2.0">
+<channel>');
+print("<title>" . $user['blogtitle'] . "</title>");
+print("<description>" . $user['blogtitle'] . " - az utolsó " . $user['limit'] . " hozzászólás</description>");
+print("<link>$site_name/" . $user['name'] . "</link>");
+foreach ($rss as $i)
+	print("<item>\n<title>" . $i[0] . "</title>\n" .
+		"<description>" . $i[1] . "</description>\n" .
+		"<link>" . $i[2] . "</link>\n</item>");
+print("</channel>\n</rss>");
+}
+
+function handle_commentrss($usernev)
+{
+	global $site_root, $site_name;
+	
+	$query = "SELECT id, blogtitle, name, `limit` FROM users WHERE name='" . $usernev. "'";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	if ($user['id']==null)
+		die("Nincs ilyen felhasználó!");
+	mysql_free_result($result);
+	$query = "select comments.title, comments.content, comments.postid from comments, posts where comments.postid = posts.id and posts.userid = ".$user['id']." order by comments.letrehozas desc limit ".$user['limit'];
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$comments[] = $i;
+	$rss = array();
+	$csere=array(
+		'&' => "&amp;",
+		'<' => "&lt;",
+		'>' => "&gt;",
+		'\'' => "&apos;",
+		'"' => "&quot;"
+		);
+	foreach ($comments as $i)
+	{
+		if($i['title'] == "")
+			$i['title']=first_words($i['content']);
+		$rss[] = array(strtr($i['title'], $csere),
+			strtr($i['content'], $csere),
+			$site_name . "/posts/" . $i['postid']);
+	}
+	mysql_free_result($result);
+	header('Content-Type: application/xml; charset=iso-8859-2');
+	print('<?xml version="1.0"  encoding="iso-8859-2"?>
+<rss version="2.0">
+<channel>');
+print("<title>" . $user['blogtitle'] . "</title>");
+print("<description>" . $user['blogtitle'] . " - az utolsó " . $user['limit'] . " hozzászólás</description>");
+print("<link>$site_name/" . $user['name'] . "</link>");
+foreach ($rss as $i)
+	print("<item>\n<title>" . $i[0] . "</title>\n" .
+		"<description>" . $i[1] . "</description>\n" .
+		"<link>" . $i[2] . "</link>\n</item>");
+print("</channel>\n</rss>");
+}
+
+function handle_comment($postid)
+{
+	global $site_root, $c_text;
+	if(count($_POST))
+	{
+		if(strlen($_POST['name'])==0)
+			$errstr="A név kitöltése kötelezõ!";
+		else if(strlen($_POST['contact'])==0)
+			$errstr="A kontakt kitöltése kötelezõ!";
+		else if(strlen($_POST['content'])==0)
+			$errstr="A tartalom kitöltése kötelezõ!";
+	}
+	if(isset($_POST['postid']))
+		$postid = $_POST['postid'];
+	$query = "SELECT users.want_antispam FROM users, posts WHERE users.id = posts.userid and posts.id = $postid";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$user = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	if (count($_POST) and strlen($errstr)==0)
+	{
+		if($user['want_antispam'])
+		{
+			include("authimage.php");
+			if(checkAICode($_POST['code'])==0)
+				die("Rossz ellenõrzõ kód!");
+		}
+		$query = "INSERT INTO comments
+		(postid, name, contact, title, content, letrehozas)
+		VALUES ('" . addslashes(stripslashes($_POST['postid'])) .
+		"', '" . addslashes(stripslashes($_POST['name'])) .
+		"', '" . addslashes(stripslashes($_POST['contact'])) .
+		"', '" . addslashes(stripslashes($_POST['title'])) .
+		"', '" . addslashes(stripslashes($_POST['content'])) .
+		"', NOW())";
+		"1098, 'jani', 'foo@bar.baz', 'cim', 'blah', NOW())";
+		mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		header("Location: $site_root/posts/" . $_POST['postid']);
+	}
+	else
+	{
+		if(count($_POST))
+			$postid=$_POST['postid'];
+		$query = "SELECT id FROM posts WHERE id=$postid";
+		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		$post = mysql_fetch_array($result, MYSQL_ASSOC);
+		mysql_free_result($result);
+		if ($post === false)
+			die("Nincs ilyen bejegyzés!");
+		include("templates/edit_comment.php");
+	}
+}
+
+function handle_new($usernev)
 {
 	global $site_root;
 	
@@ -553,13 +1024,9 @@ function create_post($usernev)
 	// jelszobekeres
 	if( !isset($_SERVER['PHP_AUTH_USER']) )
 	{
-		header("WWW-Authenticate: Basic realm=\"Bejegyzés létrehozása\"");
+		header("WWW-Authenticate: Basic realm=\"OpenBlog.hu\"");
 		header('HTTP/1.0 401 Unauthorized');
-			{
-				$realm = mt_rand( 1, 1000000000 );
-				header( 'WWW-Authenticate: Basic realm='.$realm );
 		die("A létrehozáshoz jelszó megadása szükséges!");
-			}
 	}
 	else
 	{
@@ -570,16 +1037,21 @@ function create_post($usernev)
 			(userid, title, content, letrehozas)
 			VALUES ('" . $user['id'] . "', NULL , '', NOW())";
 			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
-			header("Location: $site_root/index.php/edit/" . mysql_insert_id());
+			header("Location: $site_root/edit/" . mysql_insert_id());
 		}
 		else
+		{
+			$realm = mt_rand( 1, 1000000000 );
+			header( 'WWW-Authenticate: Basic realm='.$realm );
 			die("Nem megfelelõ felhasználónév vagy jelszó!");
+		}
 	}
 }
 
 function handle_register($theme)
 {
-	$query = 'SELECT * FROM `users` where `templatescrore`>5 LIMIT 0, 30';
+	global $site_root, $sablonkuszob, $c_text, $handlers;
+	$query = "SELECT * FROM users where templatescrore>$sablonkuszob";
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
 		$templates[] = $i;
@@ -587,21 +1059,32 @@ function handle_register($theme)
 	$valid=false;
 	foreach($templates as $i)
 		if($i['id']==$theme)
-			$valid=true;
+			$template=$i;
 	if ($theme=="register")
 	{
-		include("templates/reg_select.php");
-	}
-	elseif (!$valid)
-			'$commenturl' => "$site_root/comment/" . $i['id'],
-		die("Nem választható ilyen téma!");
-	else
-	{
-		print("ok");
-	}
-}
+		if (count($_POST))
+		{
+			if($_POST['name'] == "")
+			{
+				$hiba="A felhasználónév megadása kötelezõ!";
+				include("templates/reg_failure.php");
+				die();
+			}
+			if(in_array($_POST['name'], $handlers))
+			{
+				$hiba="A megadott név már foglalt!";
+				include("templates/reg_failure.php");
+				die();
+			}
+			if(!preg_match("/^[a-zA-Z0-9]+$/", $_POST['name']))
+			{
+				$hiba="A loginnév csak ékezetmentes kis és nagybetûket, valamint számokat tartalmazhat!";
+				include("templates/reg_failure.php");
+				die();
+			}
 			if (md5($_POST['passwd'])!=md5($_POST['passwd2']))
 			{
+				$hiba="Nem egyezik a megadott két jelszó!";
 				include("templates/reg_failure.php");
 				die();
 			}
@@ -613,32 +1096,152 @@ function handle_register($theme)
 				include("templates/reg_failure.php");
 				die();
 			}
-			if($_POST['name'] == "")
-			{
-				$hiba="A felhasználónév megadása kötelezõ!";
-				include("templates/reg_failure.php");
-				die();
-			}
-			if(!preg_match("/^[a-zA-Z0-9]+$/", $_POST['name']))
-			{
-				$hiba="A loginnév csak ékezetmentes kis és nagybetûket, valamint számokat tartalmazhat!";
-				include("templates/reg_failure.php");
-				die();
-			}
+			$query = "SELECT * FROM users WHERE id=" . $_POST['tid'];
+			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+			$template = mysql_fetch_array($result, MYSQL_ASSOC);
+			mysql_free_result($result);
+			$query = "INSERT INTO users
+			(name, passwd, displayname, blogtitle, `limit`, email,
+			templatetitle, template, archivetemplate, `date_format`,
+			registration_date)
+			VALUES ('" . addslashes(stripslashes($_POST['name'])) .
+			"', '" . md5($_POST['passwd']) .
+			"', '" . addslashes(stripslashes($_POST['displayname'])) .
+			"', '" . addslashes(stripslashes($_POST['blogtitle'])) .
+			"', " . addslashes(stripslashes($_POST['limit'])) .
+			", '" . addslashes(stripslashes($_POST['email'])) .
+			"', '" . addslashes($template['templatetitle']) .
+			"', '" . addslashes($template['template']) .
+			"', '" . addslashes($template['archivetemplate']) .
+			"', '" . addslashes(stripslashes($_POST['date_format'])) .
+			"', NOW())";
+			$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+			header("Location: $site_root/");
+		}
+		else
+			include("templates/reg_select.php");
+	}
+	elseif (is_null($template))
+		die("Nem választható ilyen téma!");
+	else
+		include("templates/reg_form.php");
+}
 
-function click_ad($id)
+function print_ad()
+{
+	$query = "SELECT * FROM ads";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$adnum = mysql_num_rows($result);
+	mysql_free_result($result);
+	
+	$id=mt_rand(1,$adnum);
+	$query = 'SELECT * FROM ads where id=' . $id;
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$ad = mysql_fetch_array($result, MYSQL_ASSOC);
+	mysql_free_result($result);
+	print('<a target=_blank href="/adclick/' . $id  . '"><img src="/ad/' . $id. '" alt="' . $ad['title'] . '"></a>');
+}
+
+function handle_ad($id)
+{
+		$query = "SELECT name, type, data, displays FROM ads WHERE id=" . $id;
+		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		$ad = mysql_fetch_array($result, MYSQL_ASSOC) or die('Nincs ilyen reklám!');
+		mysql_free_result($result);
+		$query = "UPDATE ads SET displays=" . ($ad['displays']+1) . " WHERE id=" . $id;
+		$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+		header("Content-Type: " . $ad['type']);
+		header("Content-Length: " . strlen($ad['data']));
+		header("Content-Disposition: attachment; filename=\"" . $ad['name']. "\"");
+		print($ad['data']);
+}
+
+function handle_adclick($id)
 {
 	$query = "SELECT url, clicks FROM ads WHERE id=" . $id;
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	$ad = mysql_fetch_array($result, MYSQL_ASSOC) or die('Nincs ilyen reklám!');
 	mysql_free_result($result);
+	$query = "UPDATE ads SET clicks=" . ($ad['clicks']+1) . " WHERE id=" . $id;
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
 	header("Location: " . $ad['url']);
-}
 }
 
 function push_user($id, $current)
 {
 	$query = "UPDATE users SET hits=" . ($current+1) . " WHERE id=" . $id;
 	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+}
+
+function count_posts($id)
+{
+	$query = "SELECT * FROM posts WHERE userid=" . $id . " and content != ''";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$postnum = mysql_num_rows($result);
+	mysql_free_result($result);
+	return $postnum;
+}
+
+function handle_list($id)
+{
+	global $plimit, $c_text, $date_format_fooldalipost, $posts_limit;
+	if ($id == "list" or $id == "")
+		$id=0;
+	if (is_numeric($id))
+	{
+		if ($id >= 0)
+			$limit=$id;
+		else
+			$limit=0;
+	}
+	else
+	{
+		$sterm="WHERE `name` LIKE '%$id%' ";
+		$limit=0;
+	}
+	$query = "SELECT * FROM `users` $sterm ORDER BY `name` ASC LIMIT $limit, $plimit";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$users[] = $i;
+	mysql_free_result($result);
+
+	$query = 'SELECT count(*) FROM `users`';
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	$count = mysql_fetch_array($result, MYSQL_ASSOC);
+	$max = $count['count(*)'];
+	mysql_free_result($result);
+	$prev = $limit - $plimit;
+	if ($prev < 0)
+		$prev = "";
 	$pprev = "";
+	$next = $limit + $plimit;
+	if ($next > $max - $plimit)
+		$next = $max - $plimit;
 	$nnext = $max - $plimit;
+
+	// posts doboz
+	$query = "SELECT id, name, displayname FROM users";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+		$userdb[$i['id']]=$i;
+	mysql_free_result($result);
+	$query = "SELECT id, userid, title, date_format(letrehozas, '$date_format_fooldalipost') FROM posts WHERE content != '' ORDER BY letrehozas DESC LIMIT $posts_limit";
+	$result = mysql_query($query) or die('Hiba a lekérdezésben: ' . mysql_error());
+	while ($i = mysql_fetch_array($result, MYSQL_ASSOC))
+	{
+		$i['name']=$userdb[$i['userid']]['name'];
+		$i['letrehozas']=$i["date_format(letrehozas, '$date_format_fooldalipost')"];
+		$posts[]=$i;
+	}
+	mysql_free_result($result);
+	include("templates/user_list.php");
+	
+}
+
+function handle_authimage()
+{
+	include("authimage.php");
+	createAICode("image");
+}
+
+?>

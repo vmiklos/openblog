@@ -1,28 +1,15 @@
 - templates/reg_failure.php design
-- templates/edit_comment.php design
 - /editcomment design
-hm, nezzuk
-- engine design: post
-- helpek: prefs, post
-- http header kuldese rossz jelszonal
-- archivum
-- banner kezeles
+- $commenturl implementalasa a jelenlegi sablonjainkba
 
 - kereses/regexp kereses
 - uj postnal ha visszamegy ne maradjon ures post
-- rss feed
 - torlesnel uploadokat is torolje
-- vmi pofasabb fooldal
-- nehany rendes sablon
-cerka bloggal kapcsolatban
-- ie/operaba is jolegyen
-- copyright szoveg rendberakasa
-
-kb ezek ;)
-nem tul fontosak:
 - $copyright forcolasa sablonba (akarunk ilyet? :S)
 - sql optimalizacio
 - kod dokumentalas
 - wapos postolas blogba
-- http://www.fckeditor.net/ esetleg
 - emailes postolas blogba
+- http://tinymce.moxiecode.com/ esetleg
+- ne csak regelesnel lehessen stilust valtani
+- uj valtozo: commentszam

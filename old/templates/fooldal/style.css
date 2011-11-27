@@ -1,0 +1,67 @@
+html { background: url("/old/templates/fooldal/back-html.gif") #CCCCCC; }
+body { background: url("/old/templates/fooldal/back-body.gif") repeat-x 0 0; padding: 0px; margin: 0px; text-align: center; }
+
+#clear { clear: both; padding: 0; margin: 0; }
+
+#page-wrapper {margin: 0px auto; width: 650px; background: url(/old/templates/fooldal/back-cont.gif) repeat-y center top; text-align: center; }
+#page-wrapper.plain {margin: 0px auto; width: 650px; background: url(/old/templates/fooldal/back-cont_plain.gif) repeat-y center top; text-align: center; }
+
+#page-head { margin: 0 auto; width: 640px; background: url(/old/templates/fooldal/head.jpg) no-repeat center; height: 127px; }
+#page-head img { position: relative; top: 18px; left: 75px; border: 0px; }
+
+#content { text-align: left; margin-left: 250px; margin-right: 8px; }
+#content.plain { text-align: left; margin-left: 8px; margin-right: 8px; }
+#content h1 { text-align: left; padding: 5px 0px 0px 15px;margin: 0px; border-bottom: 1px solid #cccccc;font-weight: bold; font-family: verdana;font-size: 1.0em;color: #8A360F; }
+
+#content .new { border-bottom: 1px dotted #999999; margin-bottom: 15px; margin-left: 5px; }
+#content .new h1 { border: none; padding: 0px; margin: 0px; font-family: verdana; font-size: 1.0em; color: #8A360F; }
+#content .new h2 { margin: 0px; padding-left: 5px; padding-bottom: 5px; font-family: verdana; font-size: 10px; font-weight: normal; color: #8B8682; }
+#content .new p { font-family: tahoma,helvetia,sans-serif; font-size: 0.8em;color: #000000; TEXT-ALIGN: justify; }
+#content .new a { color: red; text-decoration: underline; }
+#content .new a:hover { text-decoration: none; }
+
+#content ul { text-align: left; list-style-type: square; }
+#content ul a { color: red; text-decoration: none; }
+#content ul a:hover { text-decoration: underline; }
+#content li { font-family: verdana; font-size: 0.8em; padding-bottom: 10px; }
+#content li ul { list-style-type: disc; }
+#content li li { font-size: 1.0em; padding-bottom: 0px; }
+
+#content #listingbar { width: 90%; text-align: center; margin-top: 15px; margin-bottom: 5px; clear: both; font-family: tahoma,helvetia,sans-serif; font-size:0.8em; }
+#content #listingbar SPAN.prev { text-align: left; float: left; margin-right: 1em; }
+#content #listingbar SPAN.next { text-align: right; float: right; margin-left: 1em; }
+#content #listingbar A { color: #87421F; text-decoration: underline; }
+#content #listingbar A:hover { text-decoration: none; }
+
+#content .style { border-bottom: 1px dotted #999999; margin-bottom: 15px; margin-left: 5px; text-align: center; }
+#content .style img { border:1px solid #000000; }
+#content .style p { font-family: verdana; font-size: 0.8em; }
+#content .style a { text-decoration: none; color: red; }
+#content .style a:hover { text-decoration: underline; }
+
+#content .form { margin-bottom: 15px; margin-left: 10px; padding-left: 10px; text-align: center; }
+#content .form table { padding: 10px 0px 10px 0px; font-family: verdana; font-size: 0.7em; }
+#content .form tr { background:  #F0F0F0; }
+#content .form td { margin: 5px; padding: 5px; }
+#content .form td.left { text-align: left; }
+#content .form td.right { text-align: right; }
+#content .form td input { font-size: 0.9em; }
+#content .form input { background: #ffffff; border: 1px #000000 solid; font-family: verdana; font-size: 1.0em; }
+#content .form textarea { background: #ffffff; border: 1px #000000 solid; font-family: verdana; font-size: 0.8em;}
+#content .form p { font-size: 0.8em; font-family: verdana; }
+
+#content .rte { padding-top: 10px; padding-bottom: 20px; margin: 0px; font-family: verdana; font-size: 0.8em;  }
+
+#left-wrapper { float:left; padding-top: 0px; text-align: left; width: 249px; padding-left: 0px; }
+#left { margin: 0px 0px 0px 7px; }
+#left .box { background: url(/old/templates/fooldal/back_box_bottom.gif) no-repeat bottom right; margin: 0px; padding-bottom: 2px; }
+#left .box h3 { margin: 0; padding: 0px 8px; color: #FFF; font: bold 75%/24px Verdana, Arial, Helvetica, sans-serif; letter-spacing: 1px; background: url(/old/templates/fooldal/box-back.jpg) no-repeat; height:30px; }
+#left .box ul { list-style-type: none; margin: 10px 0px 5px 5px; padding: 0px 0px 15px 20px; }
+#left .box li { font-family: verdana; font-size: 12px; color: #000000; }
+#left .box a { color: #87421F; text-decoration: underline; }
+#left .box a:hover { color: #87421F; text-decoration: none; }
+#left .box p { font-family: verdana; font-size: 0.8em; padding: 2px 10px 10px 10px; color: #000000; }
+
+#footer { text-align: center; position: relative; margin: 0px auto; width: 640px; background: url(/old/templates/fooldal/footer_bg.jpg) no-repeat center; height: 45px; }
+#footer span { position:relative;top:40%; margin-top: 0px;  font-family: verdana; font-size: 0.7em; color: #525252; }
+#secfooter { margin: 0px auto; width: 638px; height: 10px; background: url(/old/templates/fooldal/footer_bg_sec.jpg) no-repeat center top; background-color: #ffffff; }

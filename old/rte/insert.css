@@ -1,0 +1,11 @@
+body { padding:0; margin: 0; background:  #F0F0F0; }
+table { padding: 10px 0px 10px 0px; font-family: verdana; font-size: 0.7em; }
+tr { background:  #F0F0F0; }
+td { margin: 5px; padding: 5px; }
+td.left { text-align: left; }
+td.right { text-align: right; }
+td input { font-size: 1em; }
+input { background: #ffffff; border: 1px #000000 solid; font-family: verdana; font-size: 0.7em; }
+textarea { background: #ffffff; border: 1px #000000 solid; font-family: verdana; font-size: 1.0em;}
+p { font-size: 1.0em; font-family: verdana; }
+

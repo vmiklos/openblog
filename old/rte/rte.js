@@ -65,12 +65,12 @@ function writeRichText(rte, html, width, height, buttons, readOnly) {
 		
 		if (readOnly) buttons = false;
 		
-		//adjust minimum table widths
+		//adjust minimum table widths, 30 pixel 1 gomb
 		if (isIE) {
-			if (buttons && (width < 540)) width = 540;
+			if (buttons && (width < 510)) width = 510;
 			var tablewidth = width;
 		} else {
-			if (buttons && (width < 540)) width = 540;
+			if (buttons && (width < 510)) width = 510;
 			var tablewidth = width + 4;
 		}
 		
@@ -80,21 +80,21 @@ function writeRichText(rte, html, width, height, buttons, readOnly) {
 			document.writeln('	<tr>');
 			document.writeln('		<td>');
 			document.writeln('			<select id="formatblock_' + rte + '" onchange="selectFont(\'' + rte + '\', this.id);">');
-			document.writeln('				<option value="">[Style]</option>');
-			document.writeln('				<option value="<p>">Paragraph &lt;p&gt;</option>');
-			document.writeln('				<option value="<h1>">Heading 1 &lt;h1&gt;</option>');
-			document.writeln('				<option value="<h2>">Heading 2 &lt;h2&gt;</option>');
-			document.writeln('				<option value="<h3>">Heading 3 &lt;h3&gt;</option>');
-			document.writeln('				<option value="<h4>">Heading 4 &lt;h4&gt;</option>');
-			document.writeln('				<option value="<h5>">Heading 5 &lt;h5&gt;</option>');
-			document.writeln('				<option value="<h6>">Heading 6 &lt;h6&gt;</option>');
-			document.writeln('				<option value="<address>">Address &lt;ADDR&gt;</option>');
-			document.writeln('				<option value="<pre>">Formatted &lt;pre&gt;</option>');
+			document.writeln('				<option value="">[Stílus]</option>');
+			document.writeln('				<option value="<p>">Paragrafus &lt;p&gt;</option>');
+			document.writeln('				<option value="<h1>">Címsor 1 &lt;h1&gt;</option>');
+			document.writeln('				<option value="<h2>">Címsor 2 &lt;h2&gt;</option>');
+			document.writeln('				<option value="<h3>">Címsor 3 &lt;h3&gt;</option>');
+			document.writeln('				<option value="<h4>">Címsor 4 &lt;h4&gt;</option>');
+			document.writeln('				<option value="<h5>">Címsor 5 &lt;h5&gt;</option>');
+			document.writeln('				<option value="<h6>">Címsor 6 &lt;h6&gt;</option>');
+			document.writeln('				<option value="<address>">Cím &lt;ADDR&gt;</option>');
+			document.writeln('				<option value="<pre>">Formázott &lt;pre&gt;</option>');
 			document.writeln('			</select>');
 			document.writeln('		</td>');
 			document.writeln('		<td>');
 			document.writeln('			<select id="fontname_' + rte + '" onchange="selectFont(\'' + rte + '\', this.id)">');
-			document.writeln('				<option value="Font" selected>[Font]</option>');
+			document.writeln('				<option value="Font" selected>[Betütípus]</option>');
 			document.writeln('				<option value="Arial, Helvetica, sans-serif">Arial</option>');
 			document.writeln('				<option value="Courier New, Courier, mono">Courier New</option>');
 			document.writeln('				<option value="Times New Roman, Times, serif">Times New Roman</option>');
@@ -103,7 +103,7 @@ function writeRichText(rte, html, width, height, buttons, readOnly) {
 			document.writeln('		</td>');
 			document.writeln('		<td>');
 			document.writeln('			<select unselectable="on" id="fontsize_' + rte + '" onchange="selectFont(\'' + rte + '\', this.id);">');
-			document.writeln('				<option value="Size">[Size]</option>');
+			document.writeln('				<option value="Size">[Méret]</option>');
 			document.writeln('				<option value="1">1</option>');
 			document.writeln('				<option value="2">2</option>');
 			document.writeln('				<option value="3">3</option>');
@@ -139,12 +139,12 @@ function writeRichText(rte, html, width, height, buttons, readOnly) {
 			document.writeln('		<td><div id="hilitecolor_' + rte + '"><img class="rteImage" src="' + imagesPath + 'bgcolor.gif" width="25" height="24" alt="Háttér szín" title="Háttér szín" onClick="dlgColorPalette(\'' + rte + '\', \'hilitecolor\', \'\')"></div></td>');
 			document.writeln('		<td><img class="rteVertSep" src="' + imagesPath + 'blackdot.gif" width="1" height="20" border="0" alt=""></td>');
 			document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'hyperlink.gif" width="25" height="24" alt="Link beszúrása" title="Link beszúrása" onClick="dlgInsertLink(\'' + rte + '\', \'link\')"></td>');
-			document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'image.gif" width="25" height="24" alt="Kép hozzáadása" title="Kép hozzáadása" onClick="addImage(\'' + rte + '\')"></td>');
-			if (isIE) {
+			//document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'image.gif" width="25" height="24" alt="Kép hozzáadása" title="Kép hozzáadása" onClick="addImage(\'' + rte + '\')"></td>');
+			document.writeln('		<td><div id="table_' + rte + '"><img class="rteImage" src="' + imagesPath + 'image.gif" width="25" height="24" alt="Kép feltöltése" title="Kép feltöltése" onClick="dlgUploadImage(\'' + rte + '\', \'table\', \'\')"></div></td>');
 			document.writeln('		<td><div id="table_' + rte + '"><img class="rteImage" src="' + imagesPath + 'insert_table.gif" width="25" height="24" alt="Táblázat beszúrása" title="Táblázat beszúrása" onClick="dlgInsertTable(\'' + rte + '\', \'table\', \'\')"></div></td>');
-			if (isIE) {
-				document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'spellcheck.gif" width="25" height="24" alt="Spell Check" title="Spell Check" onClick="checkspell()"></td>');
-			}
+			//if (isIE) {
+			//	document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'spellcheck.gif" width="25" height="24" alt="Helyesírás-ellenõrzés" title="Helyesírás-ellenõrzés" onClick="checkspell()"></td>');
+			//}
 	//		document.writeln('		<td><img class="rteVertSep" src="' + imagesPath + 'blackdot.gif" width="1" height="20" border="0" alt=""></td>');
 	//		document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'cut.gif" width="25" height="24" alt="Cut" title="Cut" onClick="rteCommand(\'' + rte + '\', \'cut\')"></td>');
 	//		document.writeln('		<td><img class="rteImage" src="' + imagesPath + 'copy.gif" width="25" height="24" alt="Copy" title="Copy" onClick="rteCommand(\'' + rte + '\', \'copy\')"></td>');
@@ -379,6 +379,14 @@ function dlgInsertTable(rte, command) {
 	parent.command = command;
 	currentRTE = rte;
 	InsertTable = popUpWin(includesPath + 'insert_table.htm', 'InsertTable', 360, 180, '');
+}
+
+function dlgUploadImage(rte, command) {
+	//function to open/close upload image dialog
+	//save current values
+	parent.command = command;
+	currentRTE = rte;
+	UploadImage = popUpWin('../upload', 'UploadImage', 360, 180, '');
 }
 
 function dlgInsertLink(rte, command) {
