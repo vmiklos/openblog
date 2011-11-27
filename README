@@ -21,27 +21,16 @@ It has the following benefits:
 
 Maintaining software is always a pain and given that I'm no longer paid
 for doing so, I recently switched to
-http://b2evolution.net/[b2evolution].
+https://github.com/artagnon/rejourn[rejourn].
 
 == Download
 
-----
-darcs get --partial http://vmiklos.hu/project/openblog
-----
-
-should be able to download the code.
+From https://github.com/vmiklos/openblog[github].
 
 == How does it work?
 
 I think all you have to modify is renaming `htaccess.sample` to
 `.htaccess` and finetuning `config.php`, especially the MySQL password
 part.
-
-== Samples
-
-A sample installation of openblog is available
-http://openblog.vmiklos.hu/[here].
-
-Back to my link:/projects[projects page].
 
 // vim: ft=asciidoc
